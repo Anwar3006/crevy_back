@@ -1,0 +1,39 @@
+{
+	"name": "crevy-backend",
+	"version": "1.0.0",
+	"description": "The backend service for the Crevy platform",
+	"main": "index.js",
+	"type": "module",
+	"scripts": {
+		"dev": "tsx watch --env-file=.env src/index.ts",
+		"build": "tsc",
+		"start": "node dist/index.js",
+		"db:generate": "drizzle-kit generate"
+	},
+	"dependencies": {
+		"cookie-parser": "^1.4.7",
+		"cors": "^2.8.5",
+		"drizzle-orm": "^0.45.1",
+		"express": "^5.2.1",
+		"morgan": "^1.10.1",
+		"multer": "^2.0.2",
+		"pg": "^8.16.3",
+		"rotating-file-stream": "^3.2.7",
+		"uuid": "^13.0.0",
+		"zod": "^4.1.13"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.3.8",
+		"@types/cookie-parser": "^1.4.10",
+		"@types/cors": "^2.8.19",
+		"@types/express": "^5.0.6",
+		"@types/morgan": "^1.9.10",
+		"@types/multer": "^2.0.0",
+		"@types/node": "^25.0.2",
+		"@types/pg": "^8.16.0",
+		"drizzle-kit": "^0.31.8",
+		"lefthook": "^2.0.11",
+		"tsx": "^4.21.0",
+		"typescript": "^5.6.3"
+	}
+}

@@ -1,0 +1,64 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      # Set this to `development` so to use the
+      # development stage in the Dockerfile
+      # `production` will ensure no watcher
+      # checks for changes.
+      target: ${APP_BUILD_TARGET:?APP_BUILD_TARGET env variable is required}
+    container_name: crevy-backend
+    ports:
+      - "${APP_PORT:-8080}:3000"
+    volumes:
+      - ./logs:/app/logs
+    post_start:
+      - command: chown -R 1001:1001 /app/logs
+        user: root
+    environment:
+      NODE_ENV: "${NODE_ENV:-production}"
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: "${POSTGRES_DB:-crevy}"
+      POSTGRES_USER: "${POSTGRES_USER:-postgres}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-postgres}"
+      DATABASE_URL: "${DATABASE_URL:?DATABASE_URL env variable is required}"
+    depends_on:
+      db:
+        condition: service_healthy
+    develop:
+      watch:
+        - action: sync
+          path: .
+          target: /app
+          ignore:
+            - "node_modules/"
+            - ".git/"
+            - "dist/"
+            - "logs/"
+        - action: rebuild
+          path: ./package.json
+
+  db:
+    image: postgres:16-alpine
+    container_name: express-postgres-db
+    environment:
+      POSTGRES_DB: "${POSTGRES_DB:-crevy}"
+      POSTGRES_USER: "${POSTGRES_USER:-postgres}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-postgres}"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-crevy}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+volumes:
+  postgres_data:
+    driver: local
