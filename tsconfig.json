@@ -13,7 +13,7 @@
       "@/*": ["./src/*"],
       "@config/*": ["./src/config/*"],
       "@shared/*": ["./src/shared/*"],
-      "@v1/*": ["./src/v1/*"],
+      "@v1/*": ["./src/v1/*"]
     }
   },
   "include": ["src/**/*"]

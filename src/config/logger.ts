@@ -5,9 +5,9 @@ import { createStream } from "rotating-file-stream";
 
 const logDirectory = path.resolve(process.cwd(), "logs");
 if (!fs.existsSync(logDirectory)) {
-    console.log("logs dir is missing")
-    fs.mkdirSync(logDirectory, { recursive: true });
-    console.log("directory id created", logDirectory)
+  console.log("logs dir is missing");
+  fs.mkdirSync(logDirectory, { recursive: true });
+  console.log("directory id created", logDirectory);
 }
 
 const errorLogStream = createStream("error.log", {
