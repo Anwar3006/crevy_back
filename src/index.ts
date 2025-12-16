@@ -1,5 +1,5 @@
 import { prepareDB } from "@config/db";
-import errorLogStream from "@config/logger";
+import { errorLogStream, pinoLogger } from "@config/logger";
 import settings from "@config/settings";
 import v1Router from "@v1/index";
 import cookieParser from "cookie-parser";
@@ -22,8 +22,10 @@ app.use(
 		skip: (__, res) => res.statusCode < 400,
 	}),
 );
+
 app.use("/api/v1", v1Router);
-app.listen(3000, () =>
-	console.log(`Server running on port ${settings.APP_PORT}`),
+
+app.listen(settings.APP_PORT, () =>
+	pinoLogger.info(`Server running on port ${settings.APP_PORT}`),
 );
-prepareDB();
+// prepareDB();

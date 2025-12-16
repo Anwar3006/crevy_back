@@ -1,10 +1,10 @@
 export enum EEnvironment {
-    dev = "development",
-    prod = "production",
-};
+	dev = "development",
+	prod = "production",
+}
 
 export type TResponsePayload = {
-    success: boolean;
-    message: string;
-    data: object;
+	success: boolean;
+	message: string;
+	data: object;
 };
