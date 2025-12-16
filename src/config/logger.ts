@@ -8,24 +8,24 @@ import { createStream } from "rotating-file-stream";
 
 const logDirectory = path.resolve(process.cwd(), "logs");
 if (!fs.existsSync(logDirectory)) {
-	console.log("logs dir is missing");
-	fs.mkdirSync(logDirectory, { recursive: true });
-	console.log("directory id created", logDirectory);
+  console.log("logs dir is missing");
+  fs.mkdirSync(logDirectory, { recursive: true });
+  console.log("directory id created", logDirectory);
 }
 
 const errorLogStream = createStream("error.log", {
-	interval: "1d",
-	path: logDirectory,
+  interval: "1d",
+  path: logDirectory,
 });
 
 const pinoLogger = logger({
-	transport: {
-		target: "pino-pretty",
-	},
-	base: {
-		pid: false,
-	},
-	timestamp: () => `,"time":"${dayjs().format()}"`,
+  transport: {
+    target: "pino-pretty",
+  },
+  base: {
+    pid: false,
+  },
+  timestamp: () => `,"time":"${dayjs().format()}"`,
 });
 
 export { pinoLogger, errorLogStream };

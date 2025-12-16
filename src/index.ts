@@ -17,15 +17,15 @@ app.use(express.urlencoded());
 app.use(cookieParser());
 app.use(upload.none());
 app.use(
-	morgan("common", {
-		stream: errorLogStream,
-		skip: (__, res) => res.statusCode < 400,
-	}),
+  morgan("common", {
+    stream: errorLogStream,
+    skip: (__, res) => res.statusCode < 400,
+  }),
 );
 
 app.use("/api/v1", v1Router);
 
 app.listen(settings.APP_PORT, () =>
-	pinoLogger.info(`Server running on port ${settings.APP_PORT}`),
+  pinoLogger.info(`Server running on port ${settings.APP_PORT}`),
 );
-// prepareDB();
+prepareDB();

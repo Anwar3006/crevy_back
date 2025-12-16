@@ -1,10 +1,16 @@
 export enum EEnvironment {
-	dev = "development",
-	prod = "production",
+  dev = "development",
+  prod = "production",
 }
 
-export type TResponsePayload = {
-	success: boolean;
-	message: string;
-	data: object;
+export type THealthStatus = {
+  environment: EEnvironment;
+  appVersion: string;
+  timestamp: string;
+};
+
+export type TResponsePayload<TData> = {
+  success: boolean;
+  message: string;
+  data: TData;
 };

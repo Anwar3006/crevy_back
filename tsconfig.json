@@ -1,21 +1,21 @@
 {
-	"compilerOptions": {
-		"target": "es2020",
-		"module": "es2020",
-		"moduleResolution": "node",
-		"outDir": "dist",
-		"rootDir": "src",
-		// "baseUrl": ".",
-		"strict": true,
-		"esModuleInterop": true,
-		"forceConsistentCasingInFileNames": true,
-		"skipLibCheck": true,
-		"paths": {
-			"@/*": ["./src/*"],
-			"@config/*": ["./src/config/*"],
-			"@shared/*": ["./src/shared/*"],
-			"@v1/*": ["./src/v1/*"]
-		}
-	},
-	"include": ["src/**/*"]
+  "compilerOptions": {
+    "target": "es2020",
+    "module": "es2020",
+    "moduleResolution": "node",
+    "outDir": "dist",
+    "rootDir": "src",
+    "baseUrl": ".",
+    "strict": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "paths": {
+      "@/*": ["./src/*"],
+      "@config/*": ["./src/config/*"],
+      "@shared/*": ["./src/shared/*"],
+      "@v1/*": ["./src/v1/*"]
+    }
+  },
+  "include": ["src/**/*"]
 }
