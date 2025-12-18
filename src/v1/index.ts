@@ -1,4 +1,4 @@
-import { authRouter } from "@v1/auth/routes/auth";
+import { authRouter } from "@/v1/auth/routes/auth.route";
 import express from "express";
 import { healthRouter } from "@/v1/health/routes/health";
 

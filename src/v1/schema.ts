@@ -2,11 +2,19 @@
 // Export tables
 // Export relations
 export {
-	company,
-	companyRelationWithUser,
-	projectOwner,
-	projectOwnerRelationWithUser,
-	userRelations,
-	users,
-	userTypeEnum,
-} from "@v1/auth/models/userModel";
+  company,
+  companyRelationWithUser,
+  projectOwner,
+  projectOwnerRelationWithUser,
+} from "@v1/auth/models/auth-extension-model";
+
+export {
+  userTypeEnum,
+  user,
+  userRelations,
+  session,
+  sessionRelations,
+  account,
+  accountRelations,
+  verification,
+} from "@v1/auth/models/auth-model";
