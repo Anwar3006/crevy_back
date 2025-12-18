@@ -2,15 +2,25 @@ import { Request, Response, NextFunction } from "express";
 import { db } from "@/config/db";
 import AppError from "@/shared/errors/AppError.js";
 import { catchAsync } from "@/shared/errors/errorHandler";
-import { SignUpBody, CompleteProfileBody, TUser } from "../schema/authSchema";
-import { user, account } from "../models/auth-model";
+import {
+  SignUpBody,
+  CompleteProfileBody,
+  TUser,
+  SignInBody,
+  UserDB,
+} from "../schema/authSchema";
+import { user } from "../models/auth-model";
 import { company, projectOwner } from "../models/auth-extension-model";
-import { v7 as uuid7 } from "uuid";
-import bcrypt from "bcrypt";
+
 import AuthService from "../services/auth.service";
 import { eq } from "drizzle-orm";
-import { TResponsePayload } from "@/shared/types";
-import settings from "@/config/settings";
+import {
+  TResponsePayload,
+  TSignInSuccess,
+  TSignUpSuccess,
+} from "@/shared/types";
+
+import { auth } from "@/shared/utils/auth";
 
 const AuthController = {
   /**
@@ -18,7 +28,11 @@ const AuthController = {
    * POST /api/v1/auth/register
    */
   registerUser: catchAsync(
-    async (req: Request, res: Response, next: NextFunction) => {
+    async (
+      req: Request,
+      res: Response<TResponsePayload<TSignUpSuccess>>,
+      next: NextFunction
+    ) => {
       const registerData = req.body as SignUpBody;
 
       // Check if user already exists (before starting transaction)
@@ -66,7 +80,11 @@ const AuthController = {
    * Requires authentication
    */
   completeProfile: catchAsync(
-    async (req: Request, res: Response, next: NextFunction) => {
+    async (
+      req: Request,
+      res: Response<TResponsePayload<TSignUpSuccess>>,
+      next: NextFunction
+    ) => {
       const profileData = req.body as CompleteProfileBody;
 
       // Get authenticated user ID from session/token
@@ -79,90 +97,18 @@ const AuthController = {
 
       try {
         // Execute profile completion in ONE atomic transaction
-        const result = await db.transaction(async (tx) => {
-          // 1. Get current user to verify they need profile completion
-          const [currentUser] = await tx
-            .select()
-            .from(user)
-            .where(eq(user.id, userId))
-            .limit(1);
-
-          if (!currentUser) {
-            throw new AppError("User not found", 404);
-          }
-
-          if (currentUser.profileCompleted) {
-            throw new AppError("Profile already completed", 400);
-          }
-
-          // 2. Parse name from existing name field (set by OAuth)
-          const nameParts = currentUser.name.split(" ");
-          const firstName = nameParts[0] || "";
-          const lastName = nameParts.slice(1).join(" ") || "";
-
-          // 3. Update user with profile completion data
-          const [updatedUser] = await tx
-            .update(user)
-            .set({
-              firstName: firstName,
-              lastName: lastName,
-              userName: profileData.userName,
-              userType: profileData.userType,
-              contactNumber: profileData.contactNumber ?? null,
-              countryOfOperation: profileData.countryOfOperation ?? null,
-              profileCompleted: true,
-              updatedAt: new Date(),
-            })
-            .where(eq(user.id, userId))
-            .returning();
-
-          // 4. Create type-specific data
-          if (profileData.userType === "Company") {
-            const [newCompany] = await tx
-              .insert(company)
-              .values({
-                userId: userId,
-                legalBusinessName: profileData.company.legalBusinessName,
-                businessAddress: profileData.company.businessAddress ?? null,
-                createdAt: new Date(),
-              })
-              .returning();
-
-            return {
-              user: updatedUser,
-              company: newCompany,
-            };
-          } else {
-            // ProjectOwner
-            const [newProjectOwner] = await tx
-              .insert(projectOwner)
-              .values({
-                userId: userId,
-                projectCategory:
-                  profileData.projectOwner?.projectCategory ?? null,
-                projectStartDate:
-                  profileData.projectOwner?.projectStartDate ?? null,
-                createdAt: new Date(),
-              })
-              .returning();
-
-            return {
-              user: updatedUser,
-              projectOwner: newProjectOwner,
-            };
-          }
-        });
+        const result = await AuthService.completeProfile(userId, profileData);
 
         return res.status(200).json({
           success: true,
           message: "Profile completed successfully",
           data: {
-            id: result.user.id,
-            email: result.user.email,
-            userName: result.user.userName,
-            firstName: result.user.firstName,
-            lastName: result.user.lastName,
-            userType: result.user.userType,
+            id: result.id,
+            email: result.email,
+            userName: result.userName,
+            firstName: result.firstName,
+            lastName: result.lastName,
+            userType: result.userType,
             profileCompleted: true,
           },
         });
@@ -185,8 +131,35 @@ const AuthController = {
   ),
 
   loginUser: catchAsync(
-    async (req: Request, res: Response, next: NextFunction) => {
-      // const loginData = req.body as LoginBody;
+    async (
+      req: Request,
+      res: Response<TResponsePayload<TSignInSuccess>>,
+      next: NextFunction
+    ) => {
+      const loginData = req.body as SignInBody;
+
+      //this time we can simply use the betterAuth api
+      const result = await auth.api.signInEmail({
+        body: {
+          email: loginData.email,
+          password: loginData.password,
+        },
+      });
+
+      return res.status(200).json({
+        success: true,
+        message: "User logged in successfully",
+        data: {
+          ...result,
+          user: {
+            ...result.user,
+            image: result.user.image as string,
+            contactNumber: result.user.contactNumber as string,
+            countryOfOperation: result.user.countryOfOperation as string,
+            userType: result.user.userType as "ProjectOwner" | "Company",
+          },
+        },
+      });
     }
   ),
 

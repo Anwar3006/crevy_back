@@ -45,7 +45,7 @@ const baseUserSignUpSchema = z.object({
     .max(100, "Password must not exceed 100 characters"),
 
   // Optional fields
-  image: z.url("Invalid image URL").optional(),
+  image: z.url("Invalid image URL").optional().nullable(),
 
   contactNumber: z
     .string()
@@ -140,7 +140,7 @@ export type SignUpBody = z.infer<typeof signUpSchema.shape.body>;
  */
 export const signInSchema = z.object({
   body: z.object({
-    email: z.string().email("Invalid email format").toLowerCase().trim(),
+    email: z.email("Invalid email format").toLowerCase().trim(),
 
     password: z.string().min(1, "Password is required"),
   }),

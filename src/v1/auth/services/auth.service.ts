@@ -4,9 +4,10 @@ import bcrypt from "bcrypt";
 
 import { db } from "@/config/db";
 import { account, user } from "@v1/auth/models/auth-model";
-import { SignUpBody } from "@v1/auth/schema/authSchema";
+import { CompleteProfileBody, SignUpBody } from "@v1/auth/schema/authSchema";
 import settings from "@/config/settings";
 import { company, projectOwner } from "../models/auth-extension-model";
+import AppError from "@/shared/errors/AppError";
 
 const AuthService = {
   createUser: async (data: SignUpBody) => {
@@ -88,6 +89,99 @@ const AuthService = {
 
       return result;
     } catch (error: unknown) {
+      throw error;
+    }
+  },
+
+  completeProfile: async (userId: string, profileData: CompleteProfileBody) => {
+    try {
+      // Execute profile completion in ONE atomic transaction
+      const result = await db.transaction(async (tx) => {
+        // 1. Get current user to verify they need profile completion
+        const [currentUser] = await tx
+          .select()
+          .from(user)
+          .where(eq(user.id, userId))
+          .limit(1);
+
+        if (!currentUser) {
+          throw new AppError("User not found", 404);
+        }
+
+        if (currentUser.profileCompleted) {
+          throw new AppError("Profile already completed", 400);
+        }
+
+        // 2. Parse name from existing name field (set by OAuth)
+        const nameParts = currentUser.name.split(" ");
+        const firstName = nameParts[0] || "";
+        const lastName = nameParts.slice(1).join(" ") || "";
+
+        // 3. Update user with profile completion data
+        const [updatedUser] = await tx
+          .update(user)
+          .set({
+            firstName: firstName,
+            lastName: lastName,
+            userName: profileData.userName,
+            userType: profileData.userType,
+            contactNumber: profileData.contactNumber ?? null,
+            countryOfOperation: profileData.countryOfOperation ?? null,
+            profileCompleted: true,
+            updatedAt: new Date(),
+          })
+          .where(eq(user.id, userId))
+          .returning();
+
+        // 4. Create type-specific data
+        if (profileData.userType === "Company") {
+          const [newCompany] = await tx
+            .insert(company)
+            .values({
+              userId: userId,
+              legalBusinessName: profileData.company.legalBusinessName,
+              businessAddress: profileData.company.businessAddress ?? null,
+              createdAt: new Date(),
+            })
+            .returning();
+
+          return {
+            user: updatedUser,
+            company: newCompany,
+          };
+        } else {
+          // ProjectOwner
+          const [newProjectOwner] = await tx
+            .insert(projectOwner)
+            .values({
+              userId: userId,
+              projectCategory:
+                profileData.projectOwner?.projectCategory ?? null,
+              projectStartDate:
+                profileData.projectOwner?.projectStartDate ?? null,
+              createdAt: new Date(),
+            })
+            .returning();
+
+          return {
+            user: updatedUser,
+            projectOwner: newProjectOwner,
+          };
+        }
+      });
+
+      return {
+        id: result.user.id,
+        email: result.user.email,
+        userName: result.user.userName,
+        firstName: result.user.firstName,
+        lastName: result.user.lastName,
+        userType: result.user.userType,
+        profileCompleted: true,
+      };
+    } catch (error: any) {
+      console.error("Profile completion error:", error);
+
       throw error;
     }
   },

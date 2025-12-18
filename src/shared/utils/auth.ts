@@ -38,14 +38,27 @@ export const auth = betterAuth({
         type: "string",
         required: false,
         input: true,
+        returned: true,
       },
       countryOfOperation: {
         type: "string",
         required: false,
         input: true,
+        returned: true,
       },
       userType: {
         type: "string",
+        required: true,
+        input: true,
+        returned: true,
+      },
+      profileCompleted: {
+        type: "boolean",
+        required: true,
+        input: true,
+      },
+      deletedAt: {
+        type: "date",
         required: true,
         input: true,
       },
