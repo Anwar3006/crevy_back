@@ -54,12 +54,12 @@ export const auth = betterAuth({
       },
       profileCompleted: {
         type: "boolean",
-        required: true,
+        required: false,
         input: true,
       },
       deletedAt: {
         type: "date",
-        required: true,
+        required: false,
         input: true,
       },
     },

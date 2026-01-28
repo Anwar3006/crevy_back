@@ -11,7 +11,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
-import { user } from "./auth-model";
+import { user } from "../../auth/models/auth-model";
 import { relations } from "drizzle-orm";
 
 export const projectTypeEnum = pgEnum("project_type_enum", [
@@ -120,19 +120,20 @@ export const regenerativePractices = pgTable("regenerative_practices", {
 export const projectPractices = pgTable(
   "project_practices",
   {
-    projectId: uuid("project_id").references(() => project.id, {
-      onDelete: "cascade",
+    projectId: uuid("project_id")
+      .notNull()
+      .references(() => project.id, {
+        onDelete: "cascade",
+      }),
+    practiceId: uuid("practice_id")
+      .notNull()
+      .references(() => regenerativePractices.id, {
+        onDelete: "restrict",
+      }),
+    impactFactorAtSigning: decimal("impact_factor_at_signing", {
+      precision: 10,
+      scale: 6,
     }),
-    practiceId: uuid("practice_id").references(() => regenerativePractices.id, {
-      onDelete: "restrict",
-    }),
-    impactFactorAtPeojectCreation: decimal(
-      "impact_factor_at_project_creation",
-      {
-        precision: 10,
-        scale: 6,
-      },
-    ),
     areaHectare: decimal("area_hectare", { precision: 12, scale: 4 }).notNull(), // Area where this practice is applied
     intensity: varchar("intensity").notNull(), // Intensity of this practice
     createdAt: timestamp("created_at").defaultNow().notNull(),

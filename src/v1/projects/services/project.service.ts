@@ -1,7 +1,96 @@
 import { db } from "@/config/db";
-import { project, projectPractices } from "../models/project-model";
-import { eq } from "drizzle-orm";
+import { project, projectPractices } from "../../projects/models/project-model";
+import { and, desc, eq } from "drizzle-orm";
 import { CarbonCalculator } from "./carbon-calculator";
+
+export interface CreateProjectDTO {
+  userId: string;
+  name: string;
+  location: string;
+  startDate: string;
+  durationMonths: number;
+  projectType?: string;
+  status?: string;
+  totalAreaHectares?: number;
+  baselineEmissionsYearly?: number;
+  gpsCoordinates?: string;
+  baselineLandUse?: string;
+  soilType?: string;
+  initialSoilCarbonContent?: number;
+  expectedBiomassIncrease?: string;
+  cropLivestockTypes?: string;
+  organicAmendments?: string;
+  socialEconomicBenefits?: string;
+  planToExpandPractices?: string;
+  description?: string;
+  implementationPlan?: string;
+  expectedOutcomes?: string;
+  usesSyntheticFertilizers?: boolean;
+  usesSyntheticPesticides?: boolean;
+  supportsBiodiversityConservation?: boolean;
+  supportsWaterManagement?: boolean;
+  practices?: Array<{
+    practiceId: string;
+    areaHectare: number;
+    intensity: string;
+  }>;
+}
+
+export interface UpdateProjectDTO {
+  name?: string;
+  location?: string;
+  startDate?: string;
+  durationMonths?: number;
+  projectType?: string;
+  status?: string;
+  totalAreaHectares?: number;
+  baselineEmissionsYearly?: number;
+  gpsCoordinates?: string;
+  baselineLandUse?: string;
+  soilType?: string;
+  initialSoilCarbonContent?: number;
+  expectedBiomassIncrease?: string;
+  cropLivestockTypes?: string;
+  organicAmendments?: string;
+  socialEconomicBenefits?: string;
+  planToExpandPractices?: string;
+  description?: string;
+  implementationPlan?: string;
+  expectedOutcomes?: string;
+  usesSyntheticFertilizers?: boolean;
+  usesSyntheticPesticides?: boolean;
+  supportsBiodiversityConservation?: boolean;
+  supportsWaterManagement?: boolean;
+  practices?: Array<{
+    practiceId: string;
+    areaHectare: number;
+    intensity: string;
+  }>;
+}
+
+export interface GetProjectsQuery {
+  page?: number;
+  limit?: number;
+  status?: string;
+  projectType?: string;
+}
+
+export type ProjectStatus =
+  | "draft"
+  | "submitted"
+  | "under_review"
+  | "approved"
+  | "rejected"
+  | "active"
+  | "completed"
+  | "cancelled";
+
+export type ProjectType =
+  | "regenerative_agriculture"
+  | "renewable_energy"
+  | "waste_management"
+  | "biochar"
+  | "other";
 
 const ProjectServices = {
   createProject: async (data: any) => {
@@ -90,19 +179,50 @@ const ProjectServices = {
     }
   },
 
-  getAllUserProjects: async (userId: string) => {
-    try {
-      // Fetches projects with their practices joined
-      return await db.query.project.findMany({
-        where: eq(project.userId, userId),
-        with: {
-          projectPractices: true, // Requires drizzle-orm relational config
-        },
-      });
-    } catch (error) {
-      console.error("Error retrieving projects:", error);
-      throw error;
+  /**
+   * Get all projects for a user with pagination and filtering
+   */
+  getAllUserProjects: async (userId: string, query: GetProjectsQuery) => {
+    const page = query.page || 1;
+    const limit = query.limit || 10;
+    const offset = (page - 1) * limit;
+
+    // Build where conditions
+    const conditions = [eq(project.userId, userId)];
+    if (query.status) {
+      conditions.push(eq(project.status, query.status as ProjectStatus));
     }
+    if (query.projectType) {
+      conditions.push(
+        eq(project.projectType, query.projectType as ProjectType),
+      );
+    }
+
+    // Get projects with practices
+    const projects = await db
+      .select()
+      .from(project)
+      .where(and(...conditions))
+      .orderBy(desc(project.createdAt))
+      .limit(limit)
+      .offset(offset);
+
+    // Get practices for each project
+    const projectsWithPractices = await Promise.all(
+      projects.map(async (proj) => {
+        const practices = await db
+          .select()
+          .from(projectPractices)
+          .where(eq(projectPractices.projectId, proj.id));
+
+        return {
+          ...proj,
+          projectPractices: practices,
+        };
+      }),
+    );
+
+    return projectsWithPractices;
   },
 
   getSingleProject: async (projectId: string) => {
@@ -135,3 +255,5 @@ const ProjectServices = {
     }
   },
 };
+
+export default ProjectServices;

@@ -4,7 +4,7 @@ import {
   project,
   projectPractices,
   regenerativePractices,
-} from "../models/project-model";
+} from "../../projects/models/project-model";
 import { eq } from "drizzle-orm";
 
 export const CarbonCalculator = {

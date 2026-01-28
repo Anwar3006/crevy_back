@@ -22,7 +22,8 @@ export {
 export {
   projectStatusEnum,
   projectTypeEnum,
+  regenerativePractices,
   project,
   projectPractices,
   projectDocument,
-} from "@v1/auth/models/project-model";
+} from "@/v1/projects/models/project-model";

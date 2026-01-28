@@ -24,7 +24,7 @@ app.use(
   morgan("common", {
     stream: errorLogStream,
     skip: (__, res) => res.statusCode < 400,
-  })
+  }),
 );
 
 // Better Auth
@@ -40,6 +40,6 @@ app.use(NotFound);
 app.use(globalErrorHandler);
 
 app.listen(settings.APP_PORT, () =>
-  pinoLogger.info(`Server running on port ${settings.APP_PORT}`)
+  pinoLogger.info(`Server running on port ${settings.APP_PORT}`),
 );
-prepareDB();
+// prepareDB();
