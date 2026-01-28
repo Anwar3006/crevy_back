@@ -59,6 +59,15 @@ export const project = pgTable(
       scale: 4,
     }),
 
+    estimatedTotalTco2e: decimal("estimated_total_tco2e", {
+      precision: 15,
+      scale: 4,
+    }).default("0"), //the theoretical potential
+    verifiedTotalTco2e: decimal("verified_total_tco2e", {
+      precision: 15,
+      scale: 4,
+    }).default("0"), //what the auditor has actually confirmed
+
     soilType: varchar("soil_type"),
     initialSoilCarbonContent: decimal("initial_soil_carbon_content"), //Percentage or tC/ha
     expectedBiomassIncrease: text("expected_biomass_increase"),
@@ -117,6 +126,13 @@ export const projectPractices = pgTable(
     practiceId: uuid("practice_id").references(() => regenerativePractices.id, {
       onDelete: "restrict",
     }),
+    impactFactorAtPeojectCreation: decimal(
+      "impact_factor_at_project_creation",
+      {
+        precision: 10,
+        scale: 6,
+      },
+    ),
     areaHectare: decimal("area_hectare", { precision: 12, scale: 4 }).notNull(), // Area where this practice is applied
     intensity: varchar("intensity").notNull(), // Intensity of this practice
     createdAt: timestamp("created_at").defaultNow().notNull(),

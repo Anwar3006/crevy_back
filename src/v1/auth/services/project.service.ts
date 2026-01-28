@@ -1,6 +1,7 @@
 import { db } from "@/config/db";
 import { project, projectPractices } from "../models/project-model";
 import { eq } from "drizzle-orm";
+import { CarbonCalculator } from "./carbon-calculator";
 
 const ProjectServices = {
   createProject: async (data: any) => {
@@ -13,18 +14,40 @@ const ProjectServices = {
           .values(projectData)
           .returning();
 
-        // 2. If practices were provided, link them
+        // 2. Snapshot the practices
         if (practices && practices.length > 0) {
-          const practiceEntries = practices.map((p: any) => ({
-            projectId: newProject.id,
-            practiceId: p.practiceId,
-            areaHectare: p.areaHectare,
-            intensity: p.intensity,
-          }));
+          // Fetch current master factors to "snapshot" them
+          const masterPractices =
+            await tx.query.regenerativePractices.findMany();
+
+          const practiceEntries = practices.map((p: any) => {
+            const master = masterPractices.find(
+              (m: any) => m.id === p.practiceId,
+            );
+            return {
+              projectId: newProject.id,
+              practiceId: p.practiceId,
+              areaHectare: p.areaHectare,
+              intensity: p.intensity,
+              // THE SNAPSHOT:
+              impactFactorAtSigning: master?.carbonImpactFactor || "0",
+            };
+          });
           await tx.insert(projectPractices).values(practiceEntries);
         }
 
-        return newProject;
+        // 3. Compute and Update
+        const impact = await CarbonCalculator.calculateProjectImpact(
+          newProject.id,
+          tx,
+        );
+
+        await tx
+          .update(project)
+          .set({ estimatedTotalTco2e: impact.totalLifetimeEstimate.toString() })
+          .where(eq(project.id, newProject.id));
+
+        return { ...newProject, impact };
       });
     } catch (error) {
       console.error("Project creation error:", error);
