@@ -18,3 +18,11 @@ export {
   accountRelations,
   verification,
 } from "@v1/auth/models/auth-model";
+
+export {
+  projectStatusEnum,
+  projectTypeEnum,
+  project,
+  projectPractices,
+  projectDocument,
+} from "@v1/auth/models/project-model";
