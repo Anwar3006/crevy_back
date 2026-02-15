@@ -48,11 +48,20 @@ curl -X POST http://localhost:8081/api/v1/projects \
   -H "Content-Type: application/json" \
   -b cookies.txt \
   -d '{
-    "name": "Test Project",
-    "location": "Kenya",
+    "name": "Green Savannah Biochar Project",
+    "location": "Ghana",
+    "projectType": "biochar",
     "startDate": "2024-01-01T00:00:00.000Z",
-    "durationMonths": 12,
-    "practices": []
+    "durationMonths": 24,
+    "totalAreaHectares": 150.5,
+    "baselineEmissionsYearly": 5.2,
+    "practices": [
+      {
+        "practiceId": "0ab8e932-8f51-4dc1-b2ef-71e5fc0914a7",
+        "areaHectare": 75.25,
+        "intensity": "high"
+      }
+    ]
   }'
 ```
 

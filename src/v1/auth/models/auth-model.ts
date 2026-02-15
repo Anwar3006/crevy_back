@@ -12,6 +12,7 @@ import { company, projectOwner } from "@v1/auth/models/auth-extension-model";
 import timestamps from "@/shared/models/timestamp";
 
 export const userTypeEnum = pgEnum("user_type", ["ProjectOwner", "Company"]);
+export const userSexEnum = pgEnum("user_sex", ["Male", "Female", "Other"]);
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -19,11 +20,12 @@ export const user = pgTable("user", {
   email: text("email").notNull().unique(),
   emailVerified: boolean("email_verified").default(false).notNull(),
   image: text("image"),
+  // sex: userSexEnum("sex").notNull(),
 
   // Your existing fields
   firstName: varchar("first_name", { length: 50 }).notNull(),
   lastName: varchar("last_name", { length: 50 }).notNull(),
-  userName: varchar("user_name", { length: 20 }).notNull().unique(),
+  // userName: varchar("user_name", { length: 20 }).notNull().unique(),
   contactNumber: varchar("contact_number", { length: 20 }),
   countryOfOperation: varchar("country_of_operation", { length: 100 }),
   userType: userTypeEnum("user_type").notNull(),
@@ -49,7 +51,7 @@ export const session = pgTable(
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
   },
-  (table) => [index("session_userId_idx").on(table.userId)]
+  (table) => [index("session_userId_idx").on(table.userId)],
 );
 
 export const account = pgTable(
@@ -73,7 +75,7 @@ export const account = pgTable(
       .$onUpdate(() => /* @__PURE__ */ new Date())
       .notNull(),
   },
-  (table) => [index("account_userId_idx").on(table.userId)]
+  (table) => [index("account_userId_idx").on(table.userId)],
 );
 
 export const verification = pgTable(
@@ -89,7 +91,7 @@ export const verification = pgTable(
       .$onUpdate(() => /* @__PURE__ */ new Date())
       .notNull(),
   },
-  (table) => [index("verification_identifier_idx").on(table.identifier)]
+  (table) => [index("verification_identifier_idx").on(table.identifier)],
 );
 
 export const userRelations = relations(user, ({ many, one }) => ({

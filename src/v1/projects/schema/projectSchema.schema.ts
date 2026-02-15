@@ -35,6 +35,8 @@ export const createProjectSchema = z.object({
         "renewable_energy",
         "waste_management",
         "biochar",
+        "reforestation",
+        "blue_carbon",
         "other",
       ])
       .default("regenerative_agriculture"),

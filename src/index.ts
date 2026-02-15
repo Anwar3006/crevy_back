@@ -15,11 +15,17 @@ import { globalErrorHandler, NotFound } from "@shared/errors/errorHandler";
 const app = express();
 const upload = multer();
 app.use(morgan("dev"));
-app.use(cors());
+app.use(
+  cors({
+    origin: ["http://localhost:3000", "https://crevy-frontend.vercel.app"],
+    credentials: true,
+  }),
+);
 
 app.use(express.urlencoded());
 app.use(cookieParser());
 app.use(upload.none());
+
 app.use(
   morgan("common", {
     stream: errorLogStream,

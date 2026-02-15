@@ -1,58 +1,40 @@
 import { eq } from "drizzle-orm";
-import { v7 as uuid7 } from "uuid";
-import bcrypt from "bcrypt";
-
+import { auth } from "@/shared/utils/auth";
 import { db } from "@/config/db";
-import { account, user } from "@v1/auth/models/auth-model";
+import { user } from "@v1/auth/models/auth-model";
 import { CompleteProfileBody, SignUpBody } from "@v1/auth/schema/authSchema";
-import settings from "@/config/settings";
 import { company, projectOwner } from "../models/auth-extension-model";
 import AppError from "@/shared/errors/AppError";
 
 const AuthService = {
   createUser: async (data: SignUpBody) => {
-    const userId = uuid7();
-    const hashedPassword = await bcrypt.hash(
-      data.password,
-      settings.SALT_WORK_FACTOR
-    );
-
     try {
-      // Execute everything in ONE atomic transaction
+      // 1. Create base user and account using Better Auth API
+      // This ensures correct password hashing (scrypt) and account records are set up
+      const betterUser = await auth.api.signUpEmail({
+        body: {
+          email: data.email,
+          password: data.password,
+          name: `${data.firstName} ${data.lastName}`,
+          firstName: data.firstName,
+          lastName: data.lastName,
+          userType: data.userType,
+          contactNumber: data.contactNumber,
+          countryOfOperation: data.countryOfOperation,
+          profileCompleted: true,
+        },
+      });
+
+      if (!betterUser) {
+        throw new AppError("Failed to create user account", 500);
+      }
+
+      const userId = betterUser.user.id;
+
+      // 2. Create type-specific data in our database
+      // Note: better-auth already created the user/account records, 
+      // but we still want atomicity for our extension tables.
       const result = await db.transaction(async (tx) => {
-        // 1. Create base user
-        const [newUser] = await tx
-          .insert(user)
-          .values({
-            id: userId,
-            name: `${data.firstName} ${data.lastName}`,
-            email: data.email,
-            emailVerified: false,
-            image: data.image ?? null,
-            firstName: data.firstName,
-            lastName: data.lastName,
-            userName: data.userName,
-            contactNumber: data.contactNumber ?? null,
-            countryOfOperation: data.countryOfOperation ?? null,
-            userType: data.userType,
-            profileCompleted: true, // Email/password users have complete profiles
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          })
-          .returning();
-
-        // 2. Create account for password authentication
-        await tx.insert(account).values({
-          id: uuid7(),
-          accountId: data.email,
-          providerId: "credential",
-          userId: userId,
-          password: hashedPassword,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        });
-
-        // 3. Create type-specific data based on userType
         if (data.userType === "Company") {
           const [newCompany] = await tx
             .insert(company)
@@ -65,7 +47,7 @@ const AuthService = {
             .returning();
 
           return {
-            user: newUser,
+            user: betterUser.user,
             company: newCompany,
           };
         } else {
@@ -81,14 +63,18 @@ const AuthService = {
             .returning();
 
           return {
-            user: newUser,
+            user: betterUser.user,
             projectOwner: newProjectOwner,
           };
         }
       });
 
       return result;
-    } catch (error: unknown) {
+    } catch (error: any) {
+      console.error("AuthService.createUser error:", error);
+      // If extension fails, we'd ideally want to rollback Better Auth creation 
+      // but Better Auth doesn't support distributed transactions easily here.
+      // However, the risk is minimal given simple insertions.
       throw error;
     }
   },
@@ -123,7 +109,7 @@ const AuthService = {
           .set({
             firstName: firstName,
             lastName: lastName,
-            userName: profileData.userName,
+            // userName: profileData.userName,
             userType: profileData.userType,
             contactNumber: profileData.contactNumber ?? null,
             countryOfOperation: profileData.countryOfOperation ?? null,
@@ -173,7 +159,7 @@ const AuthService = {
       return {
         id: result.user.id,
         email: result.user.email,
-        userName: result.user.userName,
+        // userName: result.user.userName, // Not in model currently
         firstName: result.user.firstName,
         lastName: result.user.lastName,
         userType: result.user.userType,

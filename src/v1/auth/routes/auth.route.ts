@@ -19,7 +19,7 @@ const authRouter = express.Router();
 authRouter.post(
   "/register",
   validateInboundRequest(signUpSchema),
-  AuthController.registerUser
+  AuthController.registerUser,
 );
 
 /**
@@ -32,23 +32,23 @@ authRouter.post(
   "/complete-profile",
   // requireAuth, // Uncomment when auth middleware is ready
   validateInboundRequest(completeProfileSchema),
-  AuthController.completeProfile
+  AuthController.completeProfile,
 );
 
 /**
  * POST /api/v1/auth/login
  * Login with email and password
  */
-authRouter.post(
-  "/login",
-  validateInboundRequest(signInSchema),
-  AuthController.loginUser
-);
+// authRouter.post(
+//   "/login",
+//   validateInboundRequest(signInSchema),
+//   AuthController.loginUser
+// );
 
 /**
  * POST /api/v1/auth/logout
  * Logout current user
  */
-authRouter.post("/logout", AuthController.logoutUser);
+// authRouter.post("/logout", AuthController.logoutUser);
 
 export { authRouter };

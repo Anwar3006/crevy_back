@@ -13,13 +13,7 @@ export type THealthStatus = {
 
 export type TSignUpSuccess = Pick<
   UserDB,
-  | "id"
-  | "email"
-  | "userName"
-  | "firstName"
-  | "lastName"
-  | "userType"
-  | "profileCompleted"
+  "id" | "email" | "firstName" | "lastName" | "userType" | "profileCompleted"
 >;
 
 export type TSignInSuccess = {

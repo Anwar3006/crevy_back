@@ -6,7 +6,7 @@ class Settings {
   NODE_ENV: EEnvironment;
   APP_PORT: number;
   DATABASE_URL: string;
-  SALT_WORK_FACTOR: string;
+  SALT_WORK_FACTOR: number;
 
   constructor() {
     const { port, nodeEnv, databaseUrl, saltWorkFactor } = this.parseEnv();
@@ -26,7 +26,7 @@ class Settings {
       port: Number(process.env.APP_PORT) as number,
       nodeEnv: process.env.NODE_ENV as EEnvironment,
       databaseUrl: process.env.DATABASE_URL as string,
-      saltWorkFactor: process.env.SALT_WORK_FACTOR as string,
+      saltWorkFactor: Number(process.env.SALT_WORK_FACTOR) as number,
     };
   }
 }

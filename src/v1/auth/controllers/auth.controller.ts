@@ -1,24 +1,10 @@
 import { Request, Response, NextFunction } from "express";
-import { db } from "@/config/db";
 import AppError from "@/shared/errors/AppError.js";
 import { catchAsync } from "@/shared/errors/errorHandler";
-import {
-  SignUpBody,
-  CompleteProfileBody,
-  TUser,
-  SignInBody,
-  UserDB,
-} from "../schema/authSchema";
-import { user } from "../models/auth-model";
-import { company, projectOwner } from "../models/auth-extension-model";
+import { SignUpBody, CompleteProfileBody } from "../schema/authSchema";
 
 import AuthService from "../services/auth.service";
-import { eq } from "drizzle-orm";
-import {
-  TResponsePayload,
-  TSignInSuccess,
-  TSignUpSuccess,
-} from "@/shared/types";
+import { TResponsePayload, TSignUpSuccess } from "@/shared/types";
 
 import { auth } from "@/shared/utils/auth";
 
@@ -31,7 +17,7 @@ const AuthController = {
     async (
       req: Request,
       res: Response<TResponsePayload<TSignUpSuccess>>,
-      next: NextFunction
+      next: NextFunction,
     ) => {
       const registerData = req.body as SignUpBody;
 
@@ -50,10 +36,9 @@ const AuthController = {
           data: {
             id: result.user.id,
             email: result.user.email,
-            userName: result.user.userName,
             firstName: result.user.firstName,
             lastName: result.user.lastName,
-            userType: result.user.userType,
+            userType: result.user.userType as "ProjectOwner" | "Company",
             profileCompleted: true,
           },
         });
@@ -68,10 +53,10 @@ const AuthController = {
         }
 
         return next(
-          new AppError("Failed to create user. Please try again.", 500)
+          new AppError("Failed to create user. Please try again.", 500),
         );
       }
-    }
+    },
   ),
 
   /**
@@ -83,7 +68,7 @@ const AuthController = {
     async (
       req: Request,
       res: Response<TResponsePayload<TSignUpSuccess>>,
-      next: NextFunction
+      next: NextFunction,
     ) => {
       const profileData = req.body as CompleteProfileBody;
 
@@ -105,7 +90,7 @@ const AuthController = {
           data: {
             id: result.id,
             email: result.email,
-            userName: result.userName,
+
             firstName: result.firstName,
             lastName: result.lastName,
             userType: result.userType,
@@ -124,50 +109,59 @@ const AuthController = {
         }
 
         return next(
-          new AppError("Failed to complete profile. Please try again.", 500)
+          new AppError("Failed to complete profile. Please try again.", 500),
         );
       }
-    }
+    },
   ),
 
-  loginUser: catchAsync(
-    async (
-      req: Request,
-      res: Response<TResponsePayload<TSignInSuccess>>,
-      next: NextFunction
-    ) => {
-      const loginData = req.body as SignInBody;
+  // loginUser: catchAsync(
+  //   async (
+  //     req: Request,
+  //     res: Response<TResponsePayload<TSignInSuccess>>,
+  //     next: NextFunction,
+  //   ) => {
+  //     const loginData = req.body as SignInBody;
 
-      //this time we can simply use the betterAuth api
-      const result = await auth.api.signInEmail({
-        body: {
-          email: loginData.email,
-          password: loginData.password,
-        },
-      });
+  //     // Use the betterAuth api for login
+  //     const result = await auth.api.signInEmail({
+  //       body: {
+  //         email: loginData.email,
+  //         password: loginData.password,
+  //       },
+  //     });
 
-      return res.status(200).json({
-        success: true,
-        message: "User logged in successfully",
-        data: {
-          ...result,
-          user: {
-            ...result.user,
-            image: result.user.image as string,
-            contactNumber: result.user.contactNumber as string,
-            countryOfOperation: result.user.countryOfOperation as string,
-            userType: result.user.userType as "ProjectOwner" | "Company",
-          },
-        },
-      });
-    }
-  ),
+  //     return res.status(200).json({
+  //       success: true,
+  //       message: "User logged in successfully",
+  //       data: {
+  //         session: result?.session,
+  //         user: {
+  //           id: result.user.id,
+  //           email: result.user.email,
+  //           firstName: (result.user as any).firstName,
+  //           lastName: (result.user as any).lastName,
+  //           userType: (result.user as any).userType as "ProjectOwner" | "Company",
+  //           profileCompleted: (result.user as any).profileCompleted,
+  //         },
+  //       },
+  //     });
+  //   },
+  // ),
 
-  logoutUser: catchAsync(
-    async (req: Request, res: Response, next: NextFunction) => {
-      // const loginData = req.body as LoginBody;
-    }
-  ),
+  // logoutUser: catchAsync(
+  //   async (req: Request, res: Response, next: NextFunction) => {
+  //     await auth.api.signOut({
+  //       headers: req.headers,
+  //     });
+
+  //     return res.status(200).json({
+  //       success: true,
+  //       message: "User logged out successfully",
+  //       data: null,
+  //     });
+  //   },
+  // ),
 };
 
 export default AuthController;

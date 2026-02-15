@@ -31,7 +31,7 @@ export const auth = betterAuth({
       },
       userName: {
         type: "string",
-        required: true,
+        required: false,
         input: true,
       },
       contactNumber: {
@@ -64,5 +64,11 @@ export const auth = betterAuth({
       },
     },
   },
+
+  trustedOrigins: [
+    "http://localhost:3000",
+    "https://crevy-frontend.vercel.app",
+  ],
+
   plugins: [openAPI()],
 });

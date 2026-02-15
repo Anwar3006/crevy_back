@@ -90,6 +90,8 @@ export type ProjectType =
   | "renewable_energy"
   | "waste_management"
   | "biochar"
+  | "reforestation"
+  | "blue_carbon"
   | "other";
 
 const ProjectServices = {

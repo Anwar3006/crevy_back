@@ -29,15 +29,15 @@ const baseUserSignUpSchema = z.object({
     .max(50, "Last name must not exceed 50 characters")
     .trim(),
 
-  userName: z
-    .string()
-    .min(3, "Username must be at least 3 characters")
-    .max(20, "Username must not exceed 20 characters")
-    .regex(
-      /^[a-zA-Z0-9_]+$/,
-      "Username can only contain letters, numbers, and underscores"
-    )
-    .trim(),
+  // userName: z
+  //   .string()
+  //   .min(3, "Username must be at least 3 characters")
+  //   .max(20, "Username must not exceed 20 characters")
+  //   .regex(
+  //     /^[a-zA-Z0-9_]+$/,
+  //     "Username can only contain letters, numbers, and underscores",
+  //   )
+  //   .trim(),
 
   password: z
     .string()
@@ -46,6 +46,9 @@ const baseUserSignUpSchema = z.object({
 
   // Optional fields
   image: z.url("Invalid image URL").optional().nullable(),
+
+  phoneNumber: z.string().max(20, "Phone number must not exceed 20 characters"),
+  sex: z.enum(["Male", "Female", "Other"]).optional(),
 
   contactNumber: z
     .string()
@@ -218,7 +221,7 @@ export const completeProfileSchema = z.object({
         .max(20, "Username must not exceed 20 characters")
         .regex(
           /^[a-zA-Z0-9_]+$/,
-          "Username can only contain letters, numbers, and underscores"
+          "Username can only contain letters, numbers, and underscores",
         )
         .trim(),
       contactNumber: z
@@ -239,7 +242,7 @@ export const completeProfileSchema = z.object({
         .max(20, "Username must not exceed 20 characters")
         .regex(
           /^[a-zA-Z0-9_]+$/,
-          "Username can only contain letters, numbers, and underscores"
+          "Username can only contain letters, numbers, and underscores",
         )
         .trim(),
       contactNumber: z

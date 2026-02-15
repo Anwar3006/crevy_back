@@ -19,6 +19,8 @@ export const projectTypeEnum = pgEnum("project_type_enum", [
   "renewable_energy",
   "waste_management",
   "biochar",
+  "reforestation",
+  "blue_carbon",
   "other",
 ]);
 export const projectStatusEnum = pgEnum("project_status_enum", [
