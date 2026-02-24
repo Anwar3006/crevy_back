@@ -207,7 +207,42 @@ const ProjectController = {
 
   // --- Placeholder for Sequestration & Documents ---
 
+  /**
+   * GET /api/v1/projects/marketplace
+   * Get projects for the marketplace with filters
+   */
+  getMarketplaceProjects: catchAsync(
+    async (
+      req: Request,
+      res: Response<TResponsePayload<any>>,
+      next: NextFunction,
+    ) => {
+      const projects = await ProjectServices.getMarketplaceProjects(req.query);
+
+      return res.status(200).json({
+        success: true,
+        message: "Marketplace projects retrieved successfully",
+        data: projects,
+      });
+    },
+  ),
+
   // Note: These would call ImpactSyncService or DocumentServices
+  getRegenerativePractices: catchAsync(
+    async (
+      req: Request,
+      res: Response<TResponsePayload<any>>,
+      next: NextFunction,
+    ) => {
+      const practices = await ProjectServices.getRegenerativePractices();
+
+      return res.status(200).json({
+        success: true,
+        message: "Regenerative practices retrieved successfully",
+        data: practices,
+      });
+    },
+  ),
 };
 
 export default ProjectController;

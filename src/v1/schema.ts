@@ -27,4 +27,10 @@ export {
   project,
   projectPractices,
   projectDocument,
+  carbonSequestrationLog,
+  projectRelations,
+  regenerativePracticesRelations,
+  projectPracticesRelations,
+  projectDocumentRelations,
+  carbonSequestrationLogRelations,
 } from "@/v1/projects/models/project-model";

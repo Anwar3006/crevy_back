@@ -7,6 +7,7 @@ import {
   updateProjectSchema,
   projectParamsSchema,
   getAllProjectsSchema,
+  getMarketplaceProjectsSchema,
 } from "../schema/projectSchema.schema";
 
 /**
@@ -42,6 +43,27 @@ projectRouter.get(
   requireAuth,
   validateInboundRequest(getAllProjectsSchema),
   ProjectController.getAllUserProjects,
+);
+
+/**
+ * GET /api/v1/projects/marketplace
+ * Get projects for marketplace
+ */
+projectRouter.get(
+  "/marketplace",
+  requireAuth,
+  validateInboundRequest(getMarketplaceProjectsSchema),
+  ProjectController.getMarketplaceProjects,
+);
+
+/**
+ * GET /api/v1/projects/regenerative-practices
+ * Get all regenerative practices
+ */
+projectRouter.get(
+  "/regenerative-practices",
+  requireAuth,
+  ProjectController.getRegenerativePractices,
 );
 
 /**

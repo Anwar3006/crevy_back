@@ -94,6 +94,8 @@ export const project = pgTable(
     description: text("description"),
     implementationPlan: text("implementation_plan"),
     expectedOutcomes: text("expected_outcomes"),
+    sdgs: text("sdgs"), // Comma-separated or JSON
+    region: varchar("region"), // e.g. Africa, Europe, etc.
 
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),

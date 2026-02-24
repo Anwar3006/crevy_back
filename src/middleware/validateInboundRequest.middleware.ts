@@ -11,11 +11,19 @@ import * as z from "zod";
 const validateInboundRequest = (schema: zod.ZodSchema) => {
   return (req: any, res: any, next: any) => {
     try {
-      schema.parse({
+      const result = schema.parse({
         body: req.body,
         query: req.query,
         params: req.params,
-      });
+      }) as any;
+
+      // Update req objects with parsed/transformed data
+      // Note: req.query and req.params are read-only getters in Express 5 /
+      // newer router versions — mutate the existing objects instead of replacing them.
+      if (result.body) req.body = result.body;
+      if (result.query) Object.assign(req.query, result.query);
+      if (result.params) Object.assign(req.params, result.params);
+
       next();
     } catch (error: unknown) {
       if (error instanceof z.ZodError) {

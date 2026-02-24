@@ -6,7 +6,7 @@ import {
   regenerativePractices,
 } from "../../projects/models/project-model";
 import { eq } from "drizzle-orm";
-
+//TODO: This is a very basic calculator and should be expanded with more complex logic, including operational emissions, leakage, and more detailed practice impacts. This is just a starting point for demonstration purposes.
 export const CarbonCalculator = {
   // Updated Calculator Logic
   calculateProjectImpact: async (projectId: string, tx: any = db) => {

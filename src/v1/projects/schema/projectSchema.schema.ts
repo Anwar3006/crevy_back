@@ -102,6 +102,9 @@ export const createProjectSchema = z.object({
     usesSyntheticPesticides: z.boolean().default(false),
     supportsBiodiversityConservation: z.boolean().default(false),
     supportsWaterManagement: z.boolean().default(false),
+    regenerativePractices: z.string().optional(),
+    sdgs: z.array(z.string()).optional(),
+    region: z.string().optional(),
 
     // Practices array
     practices: z.array(practiceSchema).optional().default([]),
@@ -188,6 +191,9 @@ export const updateProjectSchema = z.object({
     usesSyntheticPesticides: z.boolean().optional(),
     supportsBiodiversityConservation: z.boolean().optional(),
     supportsWaterManagement: z.boolean().optional(),
+    regenerativePractices: z.string().optional(),
+    sdgs: z.array(z.string()).optional(),
+    region: z.string().optional(),
 
     practices: z.array(practiceSchema).optional(),
   }),
@@ -239,3 +245,23 @@ export const getAllProjectsSchema = z.object({
       .optional(),
   }),
 });
+
+// Schema for marketplace (global) projects
+export const getMarketplaceProjectsSchema = z.object({
+  query: z.object({
+    page: z
+      .string()
+      .optional()
+      .transform((val) => (val ? parseInt(val) : 1)),
+    limit: z
+      .string()
+      .optional()
+      .transform((val) => (val ? parseInt(val) : 10)),
+    status: z.string().optional(), // 'verified', 'pre-verified', 'pending'
+    projectType: z.string().optional(),
+    region: z.string().optional(),
+    sdgs: z.string().optional(), // Comma-separated IDs
+    search: z.string().optional(),
+  }),
+});
+
