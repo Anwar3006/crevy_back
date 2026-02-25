@@ -17,7 +17,7 @@ const upload = multer();
 app.use(morgan("dev"));
 app.use(
   cors({
-    origin: ["http://localhost:3000", "https://crevy-frontend.vercel.app"],
+    origin: ["http://localhost:3000", "https://crevy-frontend.vercel.app", "https://bx9dscmp-3000.uks1.devtunnels.ms"],
     credentials: true,
   }),
 );
@@ -48,4 +48,4 @@ app.use(globalErrorHandler);
 app.listen(settings.APP_PORT, () =>
   pinoLogger.info(`Server running on port ${settings.APP_PORT}`),
 );
-// prepareDB();
+prepareDB();

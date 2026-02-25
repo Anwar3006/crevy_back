@@ -5,6 +5,9 @@ import { db } from "@/config/db"; // your drizzle instance
 import settings from "@/config/settings";
 
 export const auth = betterAuth({
+  secret: process.env.BETTER_AUTH_SECRET,
+  baseURL: process.env.BETTER_AUTH_URL,
+
   database: drizzleAdapter(db, {
     provider: "pg", // or "mysql", "sqlite"
   }),
@@ -68,7 +71,14 @@ export const auth = betterAuth({
   trustedOrigins: [
     "http://localhost:3000",
     "https://crevy-frontend.vercel.app",
+    "https://bx9dscmp-3000.uks1.devtunnels.ms"
   ],
+
+  cookieOptions: {
+    sameSite: "none", // Required for cross-site cookies if domains differ
+    secure: true,     // Must be true if sameSite is "none"
+  },
+
 
   plugins: [openAPI()],
 });
