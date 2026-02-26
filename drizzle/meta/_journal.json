@@ -5,17 +5,9 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1766007349265,
-      "tag": "0000_AddFullAuth",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1771096546930,
-      "tag": "0001_last_zarda",
+      "when": 1772140780767,
+      "tag": "0000_AddUserProjectTables",
       "breakpoints": true
     }
-    
   ]
 }

@@ -12,7 +12,7 @@ import { company, projectOwner } from "@v1/auth/models/auth-extension-model";
 import timestamps from "@/shared/models/timestamp";
 
 export const userTypeEnum = pgEnum("user_type", ["ProjectOwner", "Company"]);
-export const userSexEnum = pgEnum("user_sex", ["Male", "Female", "Other"]);
+// export const userSexEnum = pgEnum("user_sex", ["Male", "Female", "Other"]);
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),

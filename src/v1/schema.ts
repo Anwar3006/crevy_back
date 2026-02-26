@@ -10,7 +10,7 @@ export {
 
 export {
   userTypeEnum,
-  userSexEnum,
+  // userSexEnum,
   user,
   userRelations,
   session,
