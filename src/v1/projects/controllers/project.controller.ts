@@ -59,7 +59,10 @@ const ProjectController = {
       const updateData = req.body;
 
       // Update project via service
-      const project = await ProjectServices.updateProject(updateData, id);
+      const project = await ProjectServices.updateProject(
+        updateData,
+        id as string,
+      );
 
       if (!project) {
         return res.status(404).json({
@@ -139,7 +142,7 @@ const ProjectController = {
       const { id } = req.params;
 
       // Get project via service
-      const project = await ProjectServices.getSingleProject(id);
+      const project = await ProjectServices.getSingleProject(id as string);
 
       if (!project) {
         return res.status(404).json({
@@ -179,7 +182,7 @@ const ProjectController = {
       const { id } = req.params;
 
       // Delete project via service
-      const result = await ProjectServices.deleteProject(id);
+      const result = await ProjectServices.deleteProject(id as string);
 
       if (!result) {
         return res.status(404).json({
