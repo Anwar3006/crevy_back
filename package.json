@@ -7,9 +7,9 @@
   "scripts": {
     "dev": "tsx watch --env-file=.env src/index.ts",
     "build": "npx rimraf dist && tsc",
-    "start": "tsx dist/index.js",
+    "start": "tsx --env-file=.env dist/index.js",
     "db:generate": "drizzle-kit generate",
-    "render:build": "NODE_ENV=production npm ci && npm run build && npm run db:generate",
+    "render:build": "npm ci && npm run build && npm run db:generate",
     "format": "biome format --write"
   },
   "dependencies": {
