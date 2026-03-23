@@ -9,7 +9,7 @@
     "build": "npx rimraf dist && tsc",
     "start": "tsx --env-file=.env dist/index.js",
     "db:generate": "drizzle-kit generate",
-    "render:build": "npm ci && npm run build && npm run db:generate",
+    "render:build": "npm install && npm run build && npm run db:generate",
     "format": "biome format --write"
   },
   "dependencies": {
