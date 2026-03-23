@@ -14,4 +14,6 @@ export const EnvSchema = zod.object({
   DATABASE_URL: zod.string({
     error: "DATABASE_URL must be provided in the .env file",
   }),
+  // Optional with a safe default — app still starts without it
+  SALT_WORK_FACTOR: zod.string().optional(),
 });

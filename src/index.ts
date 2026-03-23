@@ -1,3 +1,4 @@
+import "@config/env"; // MUST be first — populates process.env before settings.ts evaluates
 import { prepareDB } from "@config/db";
 import { errorLogStream, pinoLogger } from "@config/logger";
 import settings from "@config/settings";
