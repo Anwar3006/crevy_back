@@ -13,6 +13,7 @@ import { toNodeHandler } from "better-auth/node";
 import { auth } from "@shared/utils/auth";
 import { globalErrorHandler, NotFound } from "@shared/errors/errorHandler";
 
+console.log("Frontend: ", settings.FRONTEND_URL);
 const app = express();
 const upload = multer();
 app.use(morgan("dev"));
@@ -22,6 +23,7 @@ app.use(
       "http://localhost:3000",
       "https://crevy-frontend.vercel.app",
       "https://bx9dscmp-3000.uks1.devtunnels.ms",
+      "https://crevy-frontend.netlify.app",
       settings.FRONTEND_URL,
     ],
     credentials: true,
