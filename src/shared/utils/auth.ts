@@ -1,31 +1,39 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { openAPI } from "better-auth/plugins";
-import { db } from "@/config/db"; // your drizzle instance
+import { db } from "@/config/db";
 import settings from "@/config/settings";
 
 export const auth = betterAuth({
+  // ─── IMPORTANT ───────────────────────────────────────────────────────────────
+  // BETTER_AUTH_URL must be the URL of THIS server (the backend / auth server),
+  // NOT the frontend. BetterAuth uses it to build cookie domains, redirect URLs,
+  // and to validate incoming requests. Pointing it at the frontend was the
+  // primary cause of the post-login redirect loop.
+  // ─────────────────────────────────────────────────────────────────────────────
   secret: process.env.BETTER_AUTH_SECRET,
-  baseURL: process.env.BETTER_AUTH_URL,
+  baseURL: process.env.BETTER_AUTH_URL, // Must be: https://crevy-backend.onrender.com
 
   database: drizzleAdapter(db, {
-    provider: "pg", // or "mysql", "sqlite"
+    provider: "pg",
   }),
+
   emailAndPassword: {
     enabled: true,
-    requireEmailVerification: settings.NODE_ENV === "production",
+    // Only enforce email verification in production AND only once you have a
+    // working email-verification flow in the frontend. Leaving this as `true`
+    // in production without that flow silently blocks all sign-ins.
+    requireEmailVerification: false,
   },
 
-  socialProviders: {
-    // google: {},
-  }, // Add your social providers here
-  // Extend the user schema with your custom fields
+  socialProviders: {},
+
   user: {
     additionalFields: {
       firstName: {
         type: "string",
         required: true,
-        input: true, // Accept this field during sign-up
+        input: true,
       },
       lastName: {
         type: "string",
@@ -73,11 +81,24 @@ export const auth = betterAuth({
     "https://crevy-frontend.vercel.app",
     "https://bx9dscmp-3000.uks1.devtunnels.ms",
     "https://crevy-frontend.netlify.app",
+    settings.FRONTEND_URL,
   ],
 
-  cookieOptions: {
-    sameSite: "none", // Required for cross-site cookies if domains differ
-    secure: true, // Must be true if sameSite is "none"
+  // ─── IMPORTANT ───────────────────────────────────────────────────────────────
+  // `cookieOptions` is NOT a valid top-level BetterAuth key — it was previously
+  // silently ignored, meaning sameSite:"none" was never applied.
+  // The correct API is `advanced.defaultCookieAttributes`.
+  //
+  // sameSite:"none" + secure:true are REQUIRED for cross-origin cookies between
+  // crevy-backend.onrender.com and crevy-frontend.netlify.app.
+  // ─────────────────────────────────────────────────────────────────────────────
+  advanced: {
+    defaultCookieAttributes: {
+      sameSite: "none",  // Required: frontend and backend are on different domains
+      secure: true,      // Required: sameSite:none only works over HTTPS
+      httpOnly: true,    // Security: prevents JS access to session cookie
+      partitioned: true, // Required by Chrome's CHIPS spec for 3rd-party cookies
+    },
   },
 
   plugins: [openAPI()],
