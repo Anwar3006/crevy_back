@@ -71,14 +71,14 @@ export const auth = betterAuth({
   trustedOrigins: [
     "http://localhost:3000",
     "https://crevy-frontend.vercel.app",
-    "https://bx9dscmp-3000.uks1.devtunnels.ms"
+    "https://bx9dscmp-3000.uks1.devtunnels.ms",
+    "https://crevy-frontend.netlify.app",
   ],
 
   cookieOptions: {
     sameSite: "none", // Required for cross-site cookies if domains differ
-    secure: true,     // Must be true if sameSite is "none"
+    secure: true, // Must be true if sameSite is "none"
   },
-
 
   plugins: [openAPI()],
 });
