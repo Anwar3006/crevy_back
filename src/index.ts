@@ -22,6 +22,7 @@ app.use(
       "http://localhost:3000",
       "https://crevy-frontend.vercel.app",
       "https://bx9dscmp-3000.uks1.devtunnels.ms",
+      settings.FRONTEND_URL,
     ],
     credentials: true,
   }),

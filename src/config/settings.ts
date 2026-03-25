@@ -7,13 +7,16 @@ class Settings {
   APP_PORT: number;
   DATABASE_URL: string;
   SALT_WORK_FACTOR: number;
+  FRONTEND_URL: string;
 
   constructor() {
-    const { port, nodeEnv, databaseUrl, saltWorkFactor } = this.parseEnv();
+    const { port, nodeEnv, databaseUrl, saltWorkFactor, frontendUrl } =
+      this.parseEnv();
     this.APP_PORT = port;
     this.NODE_ENV = nodeEnv;
     this.DATABASE_URL = databaseUrl;
     this.SALT_WORK_FACTOR = saltWorkFactor;
+    this.FRONTEND_URL = frontendUrl;
   }
 
   parseEnv() {
@@ -27,6 +30,7 @@ class Settings {
       nodeEnv: process.env.NODE_ENV as EEnvironment,
       databaseUrl: process.env.DATABASE_URL as string,
       saltWorkFactor: Number(process.env.SALT_WORK_FACTOR) as number,
+      frontendUrl: process.env.FRONTEND_URL as string,
     };
   }
 }
