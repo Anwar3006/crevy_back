@@ -12,7 +12,7 @@ export const auth = betterAuth({
   // primary cause of the post-login redirect loop.
   // ─────────────────────────────────────────────────────────────────────────────
   secret: process.env.BETTER_AUTH_SECRET,
-  baseURL: process.env.BETTER_AUTH_URL, // Must be: https://crevy-backend.onrender.com
+  baseURL: process.env.FRONTEND_URL, // Must be: https://crevy-backend.onrender.com
 
   database: drizzleAdapter(db, {
     provider: "pg",
@@ -94,10 +94,9 @@ export const auth = betterAuth({
   // ─────────────────────────────────────────────────────────────────────────────
   advanced: {
     defaultCookieAttributes: {
-      sameSite: "none",  // Required: frontend and backend are on different domains
-      secure: true,      // Required: sameSite:none only works over HTTPS
-      httpOnly: true,    // Security: prevents JS access to session cookie
-      partitioned: true, // Required by Chrome's CHIPS spec for 3rd-party cookies
+      sameSite: "lax", // Required: frontend and backend are on different domains
+      secure: true, // Required: sameSite:none only works over HTTPS
+      httpOnly: true, // Security: prevents JS access to session cookie
     },
   },
 
