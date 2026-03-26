@@ -8,9 +8,14 @@ export const auth = betterAuth({
   /**
    * baseURL MUST be the URL of your frontend because you are using
    * Next.js rewrites to proxy /api/auth requests to the backend.
-   * Browser-side, Better Auth thinks it lives at the frontend domain.
+   *
+   * ─── CRITICAL: Set BETTER_AUTH_URL in Render env to the vercel URL ───
+   * Example: https://crevy-frontend-yttg.vercel.app/api/auth
+   * If this mismatching with your browser URL, Better Auth will redirect
+   * and cause a loop.
+   * ──────────────────────────────────────────────────────────────────
    */
-  baseURL: `${settings.FRONTEND_URL}/api/auth`,
+  baseURL: process.env.BETTER_AUTH_URL || `${settings.FRONTEND_URL}/api/auth`,
   secret: process.env.BETTER_AUTH_SECRET,
 
   database: drizzleAdapter(db, {
@@ -21,7 +26,6 @@ export const auth = betterAuth({
     enabled: true,
     requireEmailVerification: false,
   },
-
   socialProviders: {},
 
   user: {
@@ -75,20 +79,20 @@ export const auth = betterAuth({
   trustedOrigins: [
     "http://localhost:3000",
     "https://crevy-frontend.vercel.app",
+    "https://crevy-frontend-yttg.vercel.app", // User Vercel instance
     "https://bx9dscmp-3000.uks1.devtunnels.ms",
     "https://crevy-frontend.netlify.app",
     settings.FRONTEND_URL,
   ],
 
-  /**
-   * When using a reverse proxy (Netlify rewrites), we must trust
-   * the X-Forwarded-* headers to prevent redirection loops and
-   * ensure cookies are set correctly.
-   */
   advanced: {
+    /**
+     * In Better Auth, trustProxy is required for the library to respect
+     * the hostname and protocol from X-Forwarded-* headers when behind proxies.
+     */
     trustProxy: true,
     defaultCookieAttributes: {
-      sameSite: "lax", // Proxied requests appear as same-site to the browser
+      sameSite: "lax", // Lax is safe since it is proxied on same-origin.
       secure: true,
       httpOnly: true,
     },
