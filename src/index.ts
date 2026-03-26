@@ -58,7 +58,7 @@ app.use(
 );
 
 // Better Auth - Must be mounted before express.json() for body parsing
-app.all('/api/auth/{*any}"', toNodeHandler(auth));
+app.all("/api/auth/{*any}", toNodeHandler(auth));
 
 app.use(express.json());
 app.use("/api/v1", v1Router);
