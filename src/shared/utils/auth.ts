@@ -5,14 +5,13 @@ import { db } from "@/config/db";
 import settings from "@/config/settings";
 
 export const auth = betterAuth({
-  // ─── IMPORTANT ───────────────────────────────────────────────────────────────
-  // BETTER_AUTH_URL must be the URL of THIS server (the backend / auth server),
-  // NOT the frontend. BetterAuth uses it to build cookie domains, redirect URLs,
-  // and to validate incoming requests. Pointing it at the frontend was the
-  // primary cause of the post-login redirect loop.
-  // ─────────────────────────────────────────────────────────────────────────────
+  /**
+   * baseURL MUST be the URL of your frontend because you are using
+   * Next.js rewrites to proxy /api/auth requests to the backend.
+   * Browser-side, Better Auth thinks it lives at the frontend domain.
+   */
+  baseURL: `${settings.FRONTEND_URL}/api/auth`,
   secret: process.env.BETTER_AUTH_SECRET,
-  baseURL: process.env.FRONTEND_URL, // Must be: https://crevy-backend.onrender.com
 
   database: drizzleAdapter(db, {
     provider: "pg",
@@ -20,9 +19,6 @@ export const auth = betterAuth({
 
   emailAndPassword: {
     enabled: true,
-    // Only enforce email verification in production AND only once you have a
-    // working email-verification flow in the frontend. Leaving this as `true`
-    // in production without that flow silently blocks all sign-ins.
     requireEmailVerification: false,
   },
 
@@ -84,19 +80,17 @@ export const auth = betterAuth({
     settings.FRONTEND_URL,
   ],
 
-  // ─── IMPORTANT ───────────────────────────────────────────────────────────────
-  // `cookieOptions` is NOT a valid top-level BetterAuth key — it was previously
-  // silently ignored, meaning sameSite:"none" was never applied.
-  // The correct API is `advanced.defaultCookieAttributes`.
-  //
-  // sameSite:"none" + secure:true are REQUIRED for cross-origin cookies between
-  // crevy-backend.onrender.com and crevy-frontend.netlify.app.
-  // ─────────────────────────────────────────────────────────────────────────────
+  /**
+   * When using a reverse proxy (Netlify rewrites), we must trust
+   * the X-Forwarded-* headers to prevent redirection loops and
+   * ensure cookies are set correctly.
+   */
   advanced: {
+    trustProxy: true,
     defaultCookieAttributes: {
-      sameSite: "lax", // Required: frontend and backend are on different domains
-      secure: true, // Required: sameSite:none only works over HTTPS
-      httpOnly: true, // Security: prevents JS access to session cookie
+      sameSite: "lax", // Proxied requests appear as same-site to the browser
+      secure: true,
+      httpOnly: true,
     },
   },
 
