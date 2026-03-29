@@ -8,10 +8,10 @@ import {
   varchar,
   pgEnum,
 } from "drizzle-orm/pg-core";
-import { company, projectOwner } from "@v1/auth/models/auth-extension-model";
+import { company, projectOwner, admin } from "@v1/auth/models/auth-extension-model";
 import timestamps from "@/shared/models/timestamp";
 
-export const userTypeEnum = pgEnum("user_type", ["ProjectOwner", "Company"]);
+export const userTypeEnum = pgEnum("user_type", ["ProjectOwner", "Company", "Admin"]);
 // export const userSexEnum = pgEnum("user_sex", ["Male", "Female", "Other"]);
 
 export const user = pgTable("user", {
@@ -104,6 +104,10 @@ export const userRelations = relations(user, ({ many, one }) => ({
   projectOwner: one(projectOwner, {
     fields: [user.id],
     references: [projectOwner.userId],
+  }),
+  admin: one(admin, {
+    fields: [user.id],
+    references: [admin.userId],
   }),
 }));
 

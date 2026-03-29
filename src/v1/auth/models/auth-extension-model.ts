@@ -21,6 +21,14 @@ export const projectOwner = pgTable("project_owner", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+export const admin = pgTable("admin", {
+  userId: text()
+    .references(() => user.id)
+    .primaryKey(),
+  assignedBusinessId: text().references(() => user.id),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 export const companyRelationWithUser = relations(company, ({ one }) => ({
   users: one(user, {
     fields: [company.userId],
@@ -37,3 +45,14 @@ export const projectOwnerRelationWithUser = relations(
     }),
   })
 );
+
+export const adminRelationWithUser = relations(admin, ({ one }) => ({
+  users: one(user, {
+    fields: [admin.userId],
+    references: [user.id],
+  }),
+  assignedBusiness: one(user, {
+    fields: [admin.assignedBusinessId],
+    references: [user.id],
+  }),
+}));

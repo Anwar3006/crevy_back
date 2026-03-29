@@ -1,7 +1,7 @@
 import type { InferSelectModel } from "drizzle-orm";
 import { createSelectSchema } from "drizzle-zod";
 import z from "zod";
-import { company, projectOwner } from "@v1/auth/models/auth-extension-model";
+import { company, projectOwner, admin } from "@v1/auth/models/auth-extension-model";
 import { user } from "@v1/auth/models/auth-model";
 
 // ============================================================================
@@ -119,6 +119,16 @@ const projectOwnerUserSignUpSchema = baseUserSignUpSchema.extend({
 });
 
 /**
+ * Admin user sign-up schema
+ */
+const adminUserSignUpSchema = baseUserSignUpSchema.extend({
+  userType: z.literal("Admin"),
+  admin: z.object({
+    assignedBusinessId: z.string().optional(),
+  }).optional(),
+});
+
+/**
  * Complete sign-up schema with discriminated union
  * Wrapped in body object for validation middleware
  * Use this for the registration endpoint
@@ -127,6 +137,7 @@ export const signUpSchema = z.object({
   body: z.discriminatedUnion("userType", [
     companyUserSignUpSchema,
     projectOwnerUserSignUpSchema,
+    adminUserSignUpSchema,
   ]),
 });
 
@@ -159,6 +170,7 @@ export type SignInBody = z.infer<typeof signInSchema.shape.body>;
 export type UserDB = InferSelectModel<typeof user>;
 export type CompanyDB = InferSelectModel<typeof company>;
 export type ProjectOwnerDB = InferSelectModel<typeof projectOwner>;
+export type AdminDB = InferSelectModel<typeof admin>;
 
 // ============================================================================
 // APPLICATION TYPES (for logged-in users)
@@ -186,6 +198,7 @@ export type CompanyUser = SelectUserSchema & {
   userType: "Company";
   company: CompanyDB;
   projectOwner?: never;
+  admin?: never;
 };
 
 /**
@@ -195,13 +208,24 @@ export type ProjectOwnerUser = SelectUserSchema & {
   userType: "ProjectOwner";
   projectOwner: ProjectOwnerDB;
   company?: never;
+  admin?: never;
+};
+
+/**
+ * Admin user type with admin data
+ */
+export type AdminUser = SelectUserSchema & {
+  userType: "Admin";
+  admin: AdminDB;
+  company?: never;
+  projectOwner?: never;
 };
 
 /**
  * Union type for all possible user types
  * Use this to type logged-in user objects in your application
  */
-export type TUser = CompanyUser | ProjectOwnerUser;
+export type TUser = CompanyUser | ProjectOwnerUser | AdminUser;
 
 // ============================================================================
 // PROFILE COMPLETION SCHEMA (for social login users)
@@ -254,6 +278,29 @@ export const completeProfileSchema = z.object({
         .max(100, "Country must not exceed 100 characters")
         .optional(),
       projectOwner: projectOwnerDataSchema,
+    }),
+    z.object({
+      userType: z.literal("Admin"),
+      userName: z
+        .string()
+        .min(3, "Username must be at least 3 characters")
+        .max(20, "Username must not exceed 20 characters")
+        .regex(
+          /^[a-zA-Z0-9_]+$/,
+          "Username can only contain letters, numbers, and underscores",
+        )
+        .trim(),
+      contactNumber: z
+        .string()
+        .max(20, "Contact number must not exceed 20 characters")
+        .optional(),
+      countryOfOperation: z
+        .string()
+        .max(100, "Country must not exceed 100 characters")
+        .optional(),
+      admin: z.object({
+        assignedBusinessId: z.string().optional(),
+      }).optional(),
     }),
   ]),
 });
