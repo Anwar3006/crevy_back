@@ -32,7 +32,7 @@ const AuthService = {
       const userId = betterUser.user.id;
 
       // 2. Create type-specific data in our database
-      // Note: better-auth already created the user/account records, 
+      // Note: better-auth already created the user/account records,
       // but we still want atomicity for our extension tables.
       const result = await db.transaction(async (tx) => {
         if (data.userType === "Company") {
@@ -50,8 +50,7 @@ const AuthService = {
             user: betterUser.user,
             company: newCompany,
           };
-        } else {
-          // ProjectOwner
+        } else if (data.userType === "ProjectOwner") {
           const [newProjectOwner] = await tx
             .insert(projectOwner)
             .values({
@@ -66,13 +65,15 @@ const AuthService = {
             user: betterUser.user,
             projectOwner: newProjectOwner,
           };
+        } else {
+          throw new AppError("Unsupported user type", 400);
         }
       });
 
       return result;
     } catch (error: any) {
       console.error("AuthService.createUser error:", error);
-      // If extension fails, we'd ideally want to rollback Better Auth creation 
+      // If extension fails, we'd ideally want to rollback Better Auth creation
       // but Better Auth doesn't support distributed transactions easily here.
       // However, the risk is minimal given simple insertions.
       throw error;
@@ -135,8 +136,7 @@ const AuthService = {
             user: updatedUser,
             company: newCompany,
           };
-        } else {
-          // ProjectOwner
+        } else if (profileData.userType === "ProjectOwner") {
           const [newProjectOwner] = await tx
             .insert(projectOwner)
             .values({
@@ -153,6 +153,8 @@ const AuthService = {
             user: updatedUser,
             projectOwner: newProjectOwner,
           };
+        } else {
+          throw new AppError("Unsupported user type", 400);
         }
       });
 
