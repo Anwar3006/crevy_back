@@ -62,7 +62,7 @@ projectRouter.get(
  */
 projectRouter.get(
   "/regenerative-practices",
-  requireAuth,
+  // requireAuth, ← remove if this data is public
   ProjectController.getRegenerativePractices,
 );
 
