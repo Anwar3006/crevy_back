@@ -12,6 +12,9 @@ import { toNodeHandler } from "better-auth/node";
 
 import { auth } from "@shared/utils/auth";
 import { globalErrorHandler, NotFound } from "@shared/errors/errorHandler";
+import v2Router from "./v2";
+import swaggerUi from "swagger-ui-express";
+import swaggerSpec from "./config/swagger";
 
 const app = express();
 
@@ -61,11 +64,13 @@ app.use(
 app.all("/api/auth/{*any}", toNodeHandler(auth));
 
 app.use(express.json());
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use("/api/v1", v1Router);
+app.use(`/api/${settings.API_VERSION}`, v2Router);
 
 app.use(NotFound);
 app.use(globalErrorHandler);
 
-app.listen(settings.APP_PORT, () =>
-  pinoLogger.info(`Server running on port ${settings.APP_PORT}`),
-);
+
+
+export default app;

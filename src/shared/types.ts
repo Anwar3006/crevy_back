@@ -3,6 +3,7 @@ import { UserDB } from "@/v1/auth/schema/authSchema";
 export enum EEnvironment {
   dev = "development",
   prod = "production",
+  test = "test",
 }
 
 export type THealthStatus = {

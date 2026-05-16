@@ -1,43 +1,57 @@
+// src/middleware/validateInboundRequest.middleware.ts
 import type zod from "zod";
 import * as z from "zod";
 
 /**
- * Validates an inbound request based on the provided schema.
- * @param schema The schema to use for validation.
- * @returns A middleware function that will validate the request
- * and pass it to the next function if valid, or return a 400
- * error response with the validation errors if invalid.
+ * Validates an inbound request against the provided Zod schema.
+ *
+ * The schema MUST wrap fields by request location:
+ *   z.object({ body: z.object({...}), params: z.object({...}), query: z.object({...}) })
+ *
+ * On success:  req.body / req.params / req.query are replaced with the
+ *              Zod-parsed (and possibly coerced/transformed) values.
+ * On failure:  returns 400 with a structured errors object.
+ *
+ * ─── ZOD v4 NOTES ────────────────────────────────────────────────────────────
+ * z.treeifyError(error) returns the error tree DIRECTLY — no `.properties` wrapper.
+ * Structure: { _errors: string[], body: { _errors: string[], name: { _errors: [...] } } }
+ * We return the tree as-is so clients get a fully nested error map.
+ * ─────────────────────────────────────────────────────────────────────────────
  */
 const validateInboundRequest = (schema: zod.ZodSchema) => {
   return (req: any, res: any, next: any) => {
-    try {
-      const result = schema.parse({
-        body: req.body,
-        query: req.query,
-        params: req.params,
-      }) as any;
+    const result = schema.safeParse({
+      body:   req.body,
+      query:  req.query,
+      params: req.params,
+    }) as any;
 
-      // Update req objects with parsed/transformed data
-      // Note: req.query and req.params are read-only getters in Express 5 /
-      // newer router versions — mutate the existing objects instead of replacing them.
-      if (result.body) req.body = result.body;
-      if (result.query) Object.assign(req.query, result.query);
-      if (result.params) Object.assign(req.params, result.params);
+    if (!result.success) {
+      let errors: unknown;
 
-      next();
-    } catch (error: unknown) {
-      if (error instanceof z.ZodError) {
-        //@ts-ignore
-        const formattedErrors = z.treeifyError(error).properties;
-        return res.status(400).json({
-          success: false,
-          message: "Invalid request data",
-          errors: formattedErrors,
-        });
+      try {
+        // z.treeifyError is the Zod v4 API — returns nested tree directly
+        errors = (z as any).treeifyError(result.error);
+      } catch {
+        // Fallback: flat array of issue objects — works across all versions
+        errors = result.error.issues;
       }
 
-      next(error);
+      return res.status(400).json({
+        success: false,
+        message: "Invalid request data",
+        errors,
+      });
     }
+
+    // Replace req objects with Zod-parsed (and coerced/transformed) values.
+    // req.query and req.params are read-only getters in Express 5 —
+    // use Object.assign to mutate in-place rather than reassigning.
+    if (result.data.body)   req.body = result.data.body;
+    if (result.data.query)  Object.assign(req.query,  result.data.query);
+    if (result.data.params) Object.assign(req.params, result.data.params);
+
+    next();
   };
 };
 

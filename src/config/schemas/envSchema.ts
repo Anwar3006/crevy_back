@@ -1,4 +1,4 @@
-import { EEnvironment } from "@shared/types";
+import { EEnvironment } from "../../shared/types";
 import { z as zod } from "zod";
 
 export const EnvSchema = zod.object({

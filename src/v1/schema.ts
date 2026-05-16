@@ -6,7 +6,7 @@ export {
   companyRelationWithUser,
   projectOwner,
   projectOwnerRelationWithUser,
-} from "@v1/auth/models/auth-extension-model";
+} from "./auth/models/auth-extension-model";
 
 export {
   userTypeEnum,
@@ -18,7 +18,7 @@ export {
   account,
   accountRelations,
   verification,
-} from "@v1/auth/models/auth-model";
+} from "./auth/models/auth-model";
 
 export {
   projectStatusEnum,
@@ -33,4 +33,4 @@ export {
   projectPracticesRelations,
   projectDocumentRelations,
   carbonSequestrationLogRelations,
-} from "@/v1/projects/models/project-model";
+} from "./projects/models/project-model";

@@ -1,8 +1,9 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { openAPI } from "better-auth/plugins";
-import { db } from "@/config/db";
-import settings from "@/config/settings";
+import { db } from "../../config/db";
+import settings from "../../config/settings";
+import { uuidv7 } from 'uuidv7';
 
 export const auth = betterAuth({
   /**
@@ -57,16 +58,40 @@ export const auth = betterAuth({
         input: true,
         returned: true,
       },
-      userType: {
-        type: "string",
-        required: true,
-        input: true,
-        returned: true,
-      },
+      // userType: {
+      //   type: "string",
+      //   required: true,
+      //   input: true,
+      //   returned: true,
+      // }, // no longer needed, we will use roleId instead
       profileCompleted: {
         type: "boolean",
         required: false,
         input: true,
+      },
+      defaultCurrencyId: {
+        type: "number",
+        required: false,
+        input: true,
+        returned: true,
+      },
+      roleId: {
+        type: "number",
+        required: false,
+        input: false,
+        returned: true,
+      },
+      assignedBy: {
+        type: "string", //we will swtich it to use uuidv7 instead of integer for better-auth user table pk
+        required: false,
+        input: false,
+        returned: true,
+      },
+      assignedAt: {
+        type: "date",
+        required: false,
+        input: false,
+        returned: true,
       },
       deletedAt: {
         type: "date",
@@ -91,9 +116,10 @@ export const auth = betterAuth({
      * the hostname and protocol from X-Forwarded-* headers when behind proxies.
      */
     trustProxy: true,
+    generateId: () => uuidv7(),  // ← all better-auth IDs are now UUIDv7
     defaultCookieAttributes: {
       sameSite: "lax", // Lax is safe since it is proxied on same-origin.
-      secure: true,
+      secure: process.env.NODE_ENV === "production",
       httpOnly: true,
     },
   },

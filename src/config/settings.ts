@@ -1,6 +1,6 @@
 import process from "node:process";
-import { EnvSchema } from "@config/schemas/envSchema";
-import type { EEnvironment } from "@shared/types";
+import { EnvSchema } from "./schemas/envSchema";
+import type { EEnvironment } from "../shared/types";
 
 class Settings {
   NODE_ENV: EEnvironment;
@@ -8,15 +8,17 @@ class Settings {
   DATABASE_URL: string;
   SALT_WORK_FACTOR: number;
   FRONTEND_URL: string;
+  API_VERSION: string;
 
   constructor() {
-    const { port, nodeEnv, databaseUrl, saltWorkFactor, frontendUrl } =
+    const { port, nodeEnv, databaseUrl, saltWorkFactor, frontendUrl,apiVersion } =
       this.parseEnv();
     this.APP_PORT = port;
     this.NODE_ENV = nodeEnv;
     this.DATABASE_URL = databaseUrl;
     this.SALT_WORK_FACTOR = saltWorkFactor;
     this.FRONTEND_URL = frontendUrl;
+    this.API_VERSION = apiVersion;
   }
 
   parseEnv() {
@@ -31,6 +33,7 @@ class Settings {
       databaseUrl: process.env.DATABASE_URL as string,
       saltWorkFactor: Number(process.env.SALT_WORK_FACTOR) as number,
       frontendUrl: process.env.FRONTEND_URL as string,
+      apiVersion: process.env.API_VERSION as string,
     };
   }
 }

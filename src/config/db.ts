@@ -1,8 +1,8 @@
 import { readdir } from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
-import settings from "@config/settings";
-import * as schema from "@v1/schema"; //importing all models from schema file
+import settings from "./settings";
+import * as schema from "../v2/parent-model"; //importing all models from schema file
 import { drizzle } from "drizzle-orm/node-postgres";
 import { migrate } from "drizzle-orm/node-postgres/migrator";
 
