@@ -7,7 +7,9 @@ import {
   ListProjectOwnersSchema,
   UpdateProjectOwnerSchema,
 } from "../schemas/project_owner.schema";
+import { projectOwnerOnboardingSchema } from "../schemas/onboarding.schema";
 import ProjectOwnerController from "../controllers/project_owner.controller";
+import OnboardingController from "../controllers/onboarding.controller";
 
 /**
  * Permission model:
@@ -99,6 +101,14 @@ const projectOwnerRouter = Router();
  *       204:
  *         description: Profile deleted successfully
  */
+projectOwnerRouter.post(
+  "/onboard",
+  requireAuth,
+  requirePermission(["project_owners", "manage"]),
+  validateInboundRequest(projectOwnerOnboardingSchema),
+  OnboardingController.onboardProjectOwner
+);
+
 projectOwnerRouter.post(
   "/",
   requireAuth,

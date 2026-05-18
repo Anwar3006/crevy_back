@@ -3,11 +3,14 @@
 # Express + TypeScript + Postgres backend
 # ========================================
 
-ARG NODE_VERSION=24.11.1-alpine
+ARG NODE_VERSION=22.14.0-alpine
 FROM node:${NODE_VERSION} AS base
 
 # Set working directory
 WORKDIR /app
+
+# Install pnpm
+RUN corepack enable && corepack prepare pnpm@latest --activate
 
 # Create non-root user for security
 RUN addgroup -g 1001 -S nodejs && \
@@ -20,12 +23,11 @@ RUN addgroup -g 1001 -S nodejs && \
 FROM base AS deps
 
 # Copy package files
-COPY package*.json ./
+COPY package.json pnpm-lock.yaml ./
 
 # Install production dependencies
-RUN --mount=type=cache,target=/root/.npm,sharing=locked \
-    npm ci --omit=dev && \
-    npm cache clean --force
+RUN --mount=type=cache,target=/root/.local/share/pnpm/store,sharing=locked \
+    pnpm install --prod --frozen-lockfile
 
 RUN chown -R nodejs:nodejs /app
 
@@ -34,11 +36,10 @@ RUN chown -R nodejs:nodejs /app
 # ========================================
 FROM base AS build-deps
 
-COPY package*.json ./
+COPY package.json pnpm-lock.yaml ./
 
-RUN --mount=type=cache,target=/root/.npm,sharing=locked \
-    npm ci --no-audit --no-fund && \
-    npm cache clean --force
+RUN --mount=type=cache,target=/root/.local/share/pnpm/store,sharing=locked \
+    pnpm install --frozen-lockfile
 
 RUN chown -R nodejs:nodejs /app
 
@@ -51,7 +52,7 @@ FROM build-deps AS build
 COPY --chown=nodejs:nodejs . .
 
 # Build the application (TypeScript -> dist)
-RUN npm run build
+RUN pnpm run build
 
 RUN chown -R nodejs:nodejs /app
 
@@ -71,10 +72,10 @@ RUN chown -R nodejs:nodejs /app
 
 USER nodejs
 
-EXPOSE 3000
+EXPOSE 8081
 
 # Run your dev script (tsx watch) inside the container
-CMD ["npm", "run", "dev"]
+CMD ["pnpm", "run", "dev"]
 
 # ========================================
 # Production Stage
@@ -95,14 +96,14 @@ ENV NODE_ENV=production \
 
 # Copy production dependencies
 COPY --from=deps --chown=nodejs:nodejs /app/node_modules ./node_modules
-COPY --from=deps --chown=nodejs:nodejs /app/package*.json ./
+COPY --from=deps --chown=nodejs:nodejs /app/package.json ./
 
 # Copy built application
 COPY --from=build --chown=nodejs:nodejs /app/dist ./dist
 
 USER nodejs
 
-EXPOSE 3000
+EXPOSE 8081
 
 # Start production server
-CMD ["node", "dist/index.js"]
+CMD ["node", "dist/server.js"]

@@ -15,6 +15,13 @@
       "when": 1778951999845,
       "tag": "0001_stormy_magik",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1779115177999,
+      "tag": "0002_nappy_whizzer",
+      "breakpoints": true
     }
   ]
 }

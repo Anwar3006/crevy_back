@@ -14,7 +14,8 @@ import {
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
   name: text("name"),              // optional, we can aggregate from first name and last name
-  email: text("email").notNull().unique(),
+  email: text("email").unique(),
+  username: text("username").unique(),
   emailVerified: boolean("email_verified").default(false).notNull(),
   image: text("image"),
   createdAt: timestamp("created_at").defaultNow().notNull(),

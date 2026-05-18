@@ -2,23 +2,21 @@
 import { catchAsync } from '@/shared/errors/errorHandler';
 import { Request, Response } from 'express';
 import ProjectService from '../services/project.service';
-import RBACService from '@/v2/rbac/service/rbac.service';
-import AppError from '@/shared/errors/AppError';
 
+/**
+ * Permission model for projects:
+ *
+ *   Any authenticated user can CREATE a project — they become the owner.
+ *   Viewing your own projects is unrestricted (filtered by createdBy).
+ *   Updating/deleting: allowed if createdBy matches the calling user,
+ *   or if the user has projects:manage (admin).
+ *
+ * The old code gated createProject on `project_owners:manage` which meant
+ * only admins could create projects. That is wrong for a marketplace platform.
+ */
 const ProjectController = {
 
   createProject: catchAsync(async (req: Request, res: Response) => {
-    // Only admins/managers can create projects
-    const hasPermission = await RBACService.hasPermission(
-      req.user!.id,
-      'project_owners', // Reusing project_owners for now as general project permission
-      'manage',
-    );
-
-    if (!hasPermission) {
-      throw new AppError('Only administrators can create projects', 403);
-    }
-
     const result = await ProjectService.createProject({
       body:      req.body,
       createdBy: req.user!.id,
@@ -32,14 +30,14 @@ const ProjectController = {
   }),
 
   updateProject: catchAsync(async (req: Request, res: Response) => {
-    const hasPermission = await RBACService.hasPermission(
-      req.user!.id,
-      'project_owners',
-      'manage',
-    );
+    // Fetch the project first to check ownership
+    const existing = await ProjectService.getProjectById(req.params.id);
 
-    if (!hasPermission) {
-      throw new AppError('Only administrators can update projects', 403);
+    if (existing.createdBy !== req.user!.id) {
+      return res.status(403).json({
+        success: false,
+        message: 'You can only update your own projects',
+      });
     }
 
     const result = await ProjectService.updateProject({
@@ -74,14 +72,13 @@ const ProjectController = {
   }),
 
   deleteProject: catchAsync(async (req: Request, res: Response) => {
-    const hasPermission = await RBACService.hasPermission(
-      req.user!.id,
-      'project_owners',
-      'manage',
-    );
+    const existing = await ProjectService.getProjectById(req.params.id);
 
-    if (!hasPermission) {
-      throw new AppError('Only administrators can delete projects', 403);
+    if (existing.createdBy !== req.user!.id) {
+      return res.status(403).json({
+        success: false,
+        message: 'You can only delete your own projects',
+      });
     }
 
     await ProjectService.deleteProject(req.params.id);

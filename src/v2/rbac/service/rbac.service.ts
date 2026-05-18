@@ -57,6 +57,7 @@ type TRBACService = {
 
     // helpers
     hasPermission: (userId: string, resource: string, action: string) => Promise<boolean>,
+    getUserRole: (userId: string) => Promise<string | null>,
     checkDuplicateRole: (name: string) => Promise<boolean>;
     checkDuplicatePermission: (resource: string, action: string) => Promise<boolean>;
         
@@ -156,6 +157,16 @@ const RBACService: TRBACService = {
       );
     
     return !!result;
+   },
+
+   getUserRole: async (userId: string): Promise<string | null> => {
+    const [result] = await db
+      .select({ roleName: role.name })
+      .from(user)
+      .innerJoin(role, eq(role.id, user.roleId))
+      .where(eq(user.id, userId));
+    
+    return result?.roleName || null;
    },
 
     checkDuplicateRole: async (name: string): Promise<boolean> => {

@@ -1,7 +1,10 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { openAPI } from "better-auth/plugins";
+import { openAPI, username, customSession } from "better-auth/plugins";
 import { db } from "../../config/db";
+import { user } from "../../v2/auth/models/auth.model";
+import { role } from "../../v2/rbac/models/rbac.model";
+import { eq } from "drizzle-orm";
 import settings from "../../config/settings";
 import { uuidv7 } from 'uuidv7';
 
@@ -28,6 +31,27 @@ export const auth = betterAuth({
     requireEmailVerification: false,
   },
   socialProviders: {},
+
+  plugins: [
+    openAPI(),
+    username(),
+    customSession(async ({ user: sessionUser, session }) => {
+      const userId = sessionUser.id;
+      const [roleData] = await db
+        .select({ name: role.name })
+        .from(user)
+        .innerJoin(role, eq(role.id, user.roleId))
+        .where(eq(user.id, userId));
+
+      return {
+        user: {
+          ...sessionUser,
+          role: roleData?.name || null,
+        },
+        session,
+      };
+    }),
+  ],
 
   user: {
     additionalFields: {
@@ -123,6 +147,4 @@ export const auth = betterAuth({
       httpOnly: true,
     },
   },
-
-  plugins: [openAPI()],
 });

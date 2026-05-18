@@ -10,7 +10,7 @@ const ProjectOwnerController = {
   createProjectOwner: catchAsync(async (req: Request, res: Response) => {
     const isAdmin = await RBACService.hasPermission(
       req.user!.id,
-      "project_owners",
+      "project_owner",
       "manage"
     );
     const targetUserId = req.body.userId;
@@ -40,7 +40,7 @@ const ProjectOwnerController = {
   updateProjectOwner: catchAsync(async (req: Request, res: Response) => {
     const isAdmin = await RBACService.hasPermission(
       req.user!.id,
-      "project_owners",
+      "project_owner",
       "manage"
     );
     const targetUserId = req.params.id as string;

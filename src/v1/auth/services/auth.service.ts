@@ -174,20 +174,29 @@ const AuthService = {
     }
   },
 
-  userExists: async (email: string) => {
-    //check if user exists in the database
-    if (!email || email.trim() === "") {
-      throw new Error("Email is required");
+  userExists: async (email?: string, username?: string) => {
+    if (!email && !username) {
+      throw new Error("Email or Username is required");
     }
 
-    const normalizedEmail = email.trim().toLowerCase();
+    if (email) {
+      const normalizedEmail = email.trim().toLowerCase();
+      const foundUser = await db.query.user.findFirst({
+        where: (u, { eq }) => eq(u.email, normalizedEmail),
+        columns: { id: true },
+      });
+      if (foundUser) return true;
+    }
 
-    const foundUser = await db.query.user.findFirst({
-      where: eq(user.email, normalizedEmail),
-      columns: { id: true },
-    });
+    if (username) {
+      const foundUser = await db.query.user.findFirst({
+        where: (u, { eq }) => eq(u.username, username),
+        columns: { id: true },
+      });
+      if (foundUser) return true;
+    }
 
-    return Boolean(foundUser);
+    return false;
   },
 };
 

@@ -54,6 +54,16 @@ const RBACController = {
 
     return res.status(204).send();
   }),
+
+  getUserRole: catchAsync(async (req: Request, res: Response, _next: NextFunction) => {
+    const userId = req.user!.id;
+    const roleName = await RBACService.getUserRole(userId);
+
+    return res.status(200).json({
+      success: true,
+      data: { role: roleName },
+    });
+  }),
 };
 
 export default RBACController;

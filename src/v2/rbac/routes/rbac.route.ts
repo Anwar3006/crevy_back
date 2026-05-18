@@ -143,4 +143,11 @@ rbacRouter.delete(
   RBACController.unassignPermissionFromRole
 );
 
+rbacRouter.get(
+  "/me/role",
+  requireAuth,
+  RBACController.getUserRole
+);
+
 export default rbacRouter;
+
