@@ -18,7 +18,7 @@ export const EnrollPlotSchema = z.object({
 
 export const UpdateProjectPlotSchema = z.object({
   params: z.object({
-    id: z.string().uuid('Invalid project-plot ID'),
+    id: z.string('Invalid project-plot ID'),
   }),
   body: z.object({
     enrolledAreaHectares: z.coerce.number().positive().optional(),

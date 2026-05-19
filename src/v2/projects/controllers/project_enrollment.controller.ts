@@ -39,7 +39,7 @@ const ProjectEnrollmentController = {
     }
 
     const result = await ProjectEnrollmentService.updateEnrollment({
-      params: { id: req.params.id },
+      params: { id: req.params.id as string },
       body:   req.body,
     });
 
@@ -51,7 +51,7 @@ const ProjectEnrollmentController = {
   }),
 
   getEnrollmentById: catchAsync(async (req: Request, res: Response) => {
-    const result = await ProjectEnrollmentService.getEnrollmentById(req.params.id);
+    const result = await ProjectEnrollmentService.getEnrollmentById(req.params.id as string);
 
     return res.status(200).json({
       success: true,
@@ -80,7 +80,7 @@ const ProjectEnrollmentController = {
       throw new AppError('Only administrators can delete enrollments', 403);
     }
 
-    await ProjectEnrollmentService.deleteEnrollment(req.params.id);
+    await ProjectEnrollmentService.deleteEnrollment(req.params.id as string);
     return res.status(204).send();
   }),
 };

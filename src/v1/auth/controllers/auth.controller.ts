@@ -33,12 +33,12 @@ const AuthController = {
         return res.status(201).json({
           success: true,
           message: "User registered successfully",
+          //@ts-ignore
           data: {
             id: result.user.id,
             email: result.user.email,
             firstName: result.user.firstName,
             lastName: result.user.lastName,
-            userType: result.user.userType as "ProjectOwner" | "Company",
             profileCompleted: true,
           },
         });

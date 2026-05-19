@@ -31,7 +31,7 @@ const ProjectController = {
 
   updateProject: catchAsync(async (req: Request, res: Response) => {
     // Fetch the project first to check ownership
-    const existing = await ProjectService.getProjectById(req.params.id);
+    const existing = await ProjectService.getProjectById(req.params.id as string);
 
     if (existing.createdBy !== req.user!.id) {
       return res.status(403).json({
@@ -41,7 +41,7 @@ const ProjectController = {
     }
 
     const result = await ProjectService.updateProject({
-      params: { id: req.params.id },
+      params: { id: req.params.id as string},
       body:   req.body,
     });
 
@@ -53,7 +53,7 @@ const ProjectController = {
   }),
 
   getProjectById: catchAsync(async (req: Request, res: Response) => {
-    const result = await ProjectService.getProjectById(req.params.id);
+    const result = await ProjectService.getProjectById(req.params.id as string);
 
     return res.status(200).json({
       success: true,
@@ -72,7 +72,7 @@ const ProjectController = {
   }),
 
   deleteProject: catchAsync(async (req: Request, res: Response) => {
-    const existing = await ProjectService.getProjectById(req.params.id);
+    const existing = await ProjectService.getProjectById(req.params.id as string);
 
     if (existing.createdBy !== req.user!.id) {
       return res.status(403).json({
@@ -81,7 +81,7 @@ const ProjectController = {
       });
     }
 
-    await ProjectService.deleteProject(req.params.id);
+    await ProjectService.deleteProject(req.params.id as string);
     return res.status(204).send();
   }),
 };

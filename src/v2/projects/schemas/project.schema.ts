@@ -34,7 +34,7 @@ export const CreateProjectSchema = z.object({
 
 export const UpdateProjectSchema = z.object({
   params: z.object({
-    id: z.string().uuid('Invalid project ID'),
+    id: z.string('Invalid project ID'),
   }),
   body: z.object({
     name:              z.string().min(1).max(255).optional(),

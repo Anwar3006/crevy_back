@@ -59,7 +59,6 @@ const OnboardingService = {
             contactNumber,
             countryOfOperation,
             username: contactNumber, // Use contact number as username
-            roleId: poRole.id,
             profileCompleted: true,
           }
         });

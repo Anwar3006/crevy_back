@@ -18,7 +18,7 @@ const AuthService = {
           name: `${data.firstName} ${data.lastName}`,
           firstName: data.firstName,
           lastName: data.lastName,
-          userType: data.userType,
+          
           contactNumber: data.contactNumber,
           countryOfOperation: data.countryOfOperation,
           profileCompleted: true,

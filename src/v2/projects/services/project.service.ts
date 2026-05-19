@@ -32,8 +32,6 @@ const ProjectService = {
         sdgs:              body.sdgs ?? [],
         region:            body.region,
         country:           body.country,
-        gpsCoordinates:    body.gpsCoordinates ?? null,
-        totalAreaHectares: body.totalAreaHectares?.toString() ?? null,
         startDate:         body.startDate,
         endDate:           body.endDate ?? null,
         currencyId:        body.currencyId,

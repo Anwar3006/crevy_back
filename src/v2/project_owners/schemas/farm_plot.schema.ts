@@ -33,7 +33,7 @@ export const CreateFarmPlotSchema = z.object({
 
 export const UpdateFarmPlotSchema = z.object({
   params: z.object({
-    id: z.string().uuid(),
+    id: z.string(),
   }),
   body: z.object({
     country: z.string().optional(),

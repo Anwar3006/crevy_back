@@ -30,7 +30,7 @@ const FarmPlotController = {
   }),
 
   updateFarmPlot: catchAsync(async (req: Request, res: Response) => {
-    const plot = await FarmPlotService.getFarmPlotById(req.params.id);
+    const plot = await FarmPlotService.getFarmPlotById(req.params.id as string);
     const po = await ProjectOwnerService.getProjectOwnerById(plot.projectOwnerId);
 
     const isAssignedAdmin = po.onboardedBy === req.user!.id;
@@ -42,7 +42,7 @@ const FarmPlotController = {
 
     const result = await FarmPlotService.updateFarmPlot({
       body: req.body,
-      params: { id: req.params.id },
+      params: { id: req.params.id as string },
     });
 
     return res.status(200).json({
@@ -53,7 +53,7 @@ const FarmPlotController = {
   }),
 
   getFarmPlotById: catchAsync(async (req: Request, res: Response) => {
-    const result = await FarmPlotService.getFarmPlotById(req.params.id);
+    const result = await FarmPlotService.getFarmPlotById(req.params.id as string);
 
     return res.status(200).json({
       success: true,
@@ -82,7 +82,7 @@ const FarmPlotController = {
   }),
 
   deleteFarmPlot: catchAsync(async (req: Request, res: Response) => {
-    const plot = await FarmPlotService.getFarmPlotById(req.params.id);
+    const plot = await FarmPlotService.getFarmPlotById(req.params.id as string);
     const po = await ProjectOwnerService.getProjectOwnerById(plot.projectOwnerId);
 
     const isAssignedAdmin = po.onboardedBy === req.user!.id;
@@ -92,7 +92,7 @@ const FarmPlotController = {
       throw new AppError("You are not authorized to manage plots for this project owner", 403);
     }
 
-    await FarmPlotService.deleteFarmPlot(req.params.id);
+    await FarmPlotService.deleteFarmPlot(req.params.id as string);
     return res.status(204).send();
   }),
 };

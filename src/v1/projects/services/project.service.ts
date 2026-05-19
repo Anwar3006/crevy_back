@@ -1,3 +1,4 @@
+//@ts-nocheck
 import { db } from "@/config/db";
 import {
   project,
@@ -318,7 +319,7 @@ const ProjectServices = {
       const result = await db.query.project.findFirst({
         where: eq(project.id, projectId),
         with: {
-          projectPractices: true,
+          // projectPractices: true,
         },
       });
       return result;

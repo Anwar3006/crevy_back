@@ -39,7 +39,7 @@ const ProjectPlotController = {
     }
 
     const result = await ProjectPlotService.updateProjectPlot({
-      params: { id: req.params.id },
+      params: { id: req.params.id as string },
       body:   req.body,
     });
 
@@ -51,7 +51,7 @@ const ProjectPlotController = {
   }),
 
   getProjectPlotById: catchAsync(async (req: Request, res: Response) => {
-    const result = await ProjectPlotService.getProjectPlotById(req.params.id);
+    const result = await ProjectPlotService.getProjectPlotById(req.params.id as string);
 
     return res.status(200).json({
       success: true,
@@ -80,7 +80,7 @@ const ProjectPlotController = {
       throw new AppError('Only administrators can delete project plot enrollments', 403);
     }
 
-    await ProjectPlotService.deleteProjectPlot(req.params.id);
+    await ProjectPlotService.deleteProjectPlot(req.params.id as string);
     return res.status(204).send();
   }),
 };

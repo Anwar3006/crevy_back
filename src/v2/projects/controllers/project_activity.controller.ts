@@ -39,7 +39,7 @@ const ProjectActivityController = {
     }
 
     const result = await ProjectActivityService.updateActivity({
-      params: { id: parseInt(req.params.id) },
+      params: { id: parseInt(req.params.id as string) },
       body:   req.body,
     });
 
@@ -51,7 +51,7 @@ const ProjectActivityController = {
   }),
 
   getActivityById: catchAsync(async (req: Request, res: Response) => {
-    const result = await ProjectActivityService.getActivityById(parseInt(req.params.id));
+    const result = await ProjectActivityService.getActivityById(parseInt(req.params.id as string));
 
     return res.status(200).json({
       success: true,
@@ -80,7 +80,7 @@ const ProjectActivityController = {
       throw new AppError('Only administrators can delete activities', 403);
     }
 
-    await ProjectActivityService.deleteActivity(parseInt(req.params.id));
+    await ProjectActivityService.deleteActivity(parseInt(req.params.id as string));
     return res.status(204).send();
   }),
 };
