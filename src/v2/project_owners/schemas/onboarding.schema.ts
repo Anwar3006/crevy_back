@@ -5,7 +5,10 @@ export const projectOwnerOnboardingSchema = z.object({
     // User Table Info
     firstName: z.string().min(1, "First name is required"),
     lastName: z.string().min(1, "Last name is required"),
-    email: z.string().email("Invalid email format").optional().nullable(),
+    email: z.preprocess(
+      (val) => (val === "" ? null : val),
+      z.string().email("Invalid email format").optional().nullable()
+    ),
     contactNumber: z.string().min(1, "Contact number is required"),
     password: z.string().min(8, "Password must be at least 8 characters"),
     countryOfOperation: z.string().min(1, "Country is required"),
@@ -39,6 +42,16 @@ export const projectOwnerOnboardingSchema = z.object({
     assignmentType: z.enum(["primary", "secondary"]).default("primary"),
     isB2cAssignment: z.boolean().default(false),
   })
+}).superRefine((data, ctx) => {
+  // Cross-field validation validation
+  if (!data.body.email && !data.body.contactNumber) {
+    ctx.addIssue({
+      // FIX: Changed from z.ZodIssueCode.custom to the raw string literal
+      code: "custom",
+      message: "Either Email or Contact Number must be provided to create an account",
+      path: ["body", "email"],
+    });
+  }
 });
 
 export type TProjectOwnerOnboarding = z.infer<typeof projectOwnerOnboardingSchema>;
