@@ -5,7 +5,10 @@ export const projectOwnerOnboardingSchema = z.object({
     // User Table Info
     firstName: z.string().min(1, "First name is required"),
     lastName: z.string().min(1, "Last name is required"),
-    email: z.string().email("Invalid email format").optional().nullable(),
+    email: z.preprocess(
+      (val) => (val === "" ? null : val),
+      z.string().email("Invalid email format").optional().nullable()
+    ),
     contactNumber: z.string().min(1, "Contact number is required"),
     password: z.string().min(8, "Password must be at least 8 characters"),
     countryOfOperation: z.string().min(1, "Country is required"),
