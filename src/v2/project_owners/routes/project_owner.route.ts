@@ -104,7 +104,7 @@ const projectOwnerRouter = Router();
 projectOwnerRouter.post(
   "/onboard",
   requireAuth,
-  requirePermission(["project_owners", "manage"]),
+  requirePermission(["project_owner", "manage"]),
   validateInboundRequest(projectOwnerOnboardingSchema),
   OnboardingController.onboardProjectOwner
 );
@@ -113,8 +113,8 @@ projectOwnerRouter.post(
   "/",
   requireAuth,
   requirePermission(
-    ["project_owners", "manage"],
-    ["project_owners", "create_self"]
+    ["project_owner", "manage"],
+    ["project_owner", "create_self"]
   ),
   validateInboundRequest(CreateProjectOwnerSchema),
   ProjectOwnerController.createProjectOwner
@@ -123,7 +123,7 @@ projectOwnerRouter.post(
 projectOwnerRouter.get(
   "/",
   requireAuth,
-  requirePermission(["project_owners", "manage"]),
+  requirePermission(["project_owner", "manage"]),
   validateInboundRequest(ListProjectOwnersSchema),       // ← was ListProjectOwnersQuerySchema
   ProjectOwnerController.listProjectOwners
 );
@@ -138,8 +138,8 @@ projectOwnerRouter.put(
   "/:id",
   requireAuth,
   requirePermission(
-    ["project_owners", "manage"],
-    ["project_owners", "edit_self"]
+    ["project_owner", "manage"],
+    ["project_owner", "edit_self"]
   ),
   validateInboundRequest(UpdateProjectOwnerSchema),
   ProjectOwnerController.updateProjectOwner
@@ -148,7 +148,7 @@ projectOwnerRouter.put(
 projectOwnerRouter.delete(
   "/:id",
   requireAuth,
-  requirePermission(["project_owners", "manage"]),
+  requirePermission(["project_owner", "manage"]),
   ProjectOwnerController.deleteProjectOwner
 );
 

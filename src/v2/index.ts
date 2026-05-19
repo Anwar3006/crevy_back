@@ -15,6 +15,7 @@ import mrvRouter                     from "./mrv/routes/mrv.route";
 import notificationRouter            from "./notifications/routes/notification.route";
 import creditRouter                  from "./credits/routes/credit.route";
 import financialsRouter              from "./financials/routes/financials.route";
+import currencyRouter                from "./deps/routes/currency.route";
 
 const v2Router = express.Router();
 
@@ -30,5 +31,6 @@ v2Router.use("/mrv",                       mrvRouter);
 v2Router.use("/notifications",             notificationRouter);
 v2Router.use("/credits",                   creditRouter);
 v2Router.use("/financials",                financialsRouter);
+v2Router.use("/currencies",                currencyRouter);
 
 export default v2Router;

@@ -4,6 +4,7 @@ import { project } from '../models/project.model';
 import { and, asc, eq, gt, ilike, SQL } from 'drizzle-orm';
 import AppError from '@/shared/errors/AppError';
 import { TCreateProject, TListProjectsQuery, TUpdateProject } from '../schemas/project.schema';
+import CurrencyService from '../../deps/services/currency.service';
 
 const ProjectService = {
 
@@ -11,7 +12,10 @@ const ProjectService = {
     const { body, createdBy } = payload;
     const year = new Date().getFullYear();
 
-    // Generate code: PRJ-GH-2026-001
+    // 0. Handle Currency
+    const currencyRecord = await CurrencyService.getOrCreate(body.currency.code, body.currency.name);
+
+    // 1. Generate code: PRJ-GH-2026-001
     const existing = await db
       .select({ id: project.id })
       .from(project)
@@ -34,7 +38,7 @@ const ProjectService = {
         country:           body.country,
         startDate:         body.startDate,
         endDate:           body.endDate ?? null,
-        currencyId:        body.currencyId,
+        currencyId:        currencyRecord.id,
         createdBy,
       })
       .returning();

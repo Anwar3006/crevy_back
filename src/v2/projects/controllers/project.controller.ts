@@ -11,7 +11,7 @@ import ProjectService from '../services/project.service';
  *   Updating/deleting: allowed if createdBy matches the calling user,
  *   or if the user has projects:manage (admin).
  *
- * The old code gated createProject on `project_owners:manage` which meant
+ * The old code gated createProject on `project_owner:manage` which meant
  * only admins could create projects. That is wrong for a marketplace platform.
  */
 const ProjectController = {

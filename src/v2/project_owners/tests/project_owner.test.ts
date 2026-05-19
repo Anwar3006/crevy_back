@@ -61,10 +61,10 @@ describe("Project Owner Module", () => {
   // ─── POST / ─────────────────────────────────────────────────────────────────
 
   it("should allow an Admin to register a project owner for another user", async () => {
-    // 1. Grant admin the project_owners:manage permission
+    // 1. Grant admin the project_owner:manage permission
     const [perm] = await db
       .insert(permission)
-      .values({ resource: "project_owners", action: "manage" })
+      .values({ resource: "project_owner", action: "manage" })
       .returning();
 
     await db
@@ -108,7 +108,7 @@ describe("Project Owner Module", () => {
 
     const [perm] = await db
       .insert(permission)
-      .values({ resource: "project_owners", action: "create_self" })
+      .values({ resource: "project_owner", action: "create_self" })
       .returning();
 
     await db
@@ -153,7 +153,7 @@ describe("Project Owner Module", () => {
 
     const [perm] = await db
       .insert(permission)
-      .values({ resource: "project_owners", action: "create_self" })
+      .values({ resource: "project_owner", action: "create_self" })
       .returning();
 
     await db
@@ -186,10 +186,10 @@ describe("Project Owner Module", () => {
   });
 
   it("should return 409 if a project owner profile already exists for the user", async () => {
-    // 1. Grant admin project_owners:manage
+    // 1. Grant admin project_owner:manage
     const [perm] = await db
       .insert(permission)
-      .values({ resource: "project_owners", action: "manage" })
+      .values({ resource: "project_owner", action: "manage" })
       .returning();
 
     await db
@@ -239,7 +239,7 @@ describe("Project Owner Module", () => {
     // 1. Grant manage permission
     const [perm] = await db
       .insert(permission)
-      .values({ resource: "project_owners", action: "manage" })
+      .values({ resource: "project_owner", action: "manage" })
       .returning();
     await db
       .insert(rolePermission)
@@ -313,7 +313,7 @@ describe("Project Owner Module", () => {
   it("should allow a user to update their own payment details", async () => {
     // 1. Setup role/perm
     const [poRole] = await db.insert(role).values({ name: "po_edit", description: "PO Edit" }).returning();
-    const [perm] = await db.insert(permission).values({ resource: "project_owners", action: "edit_self" }).returning();
+    const [perm] = await db.insert(permission).values({ resource: "project_owner", action: "edit_self" }).returning();
     await db
       .insert(rolePermission)
       .values({ roleId: poRole.id, permissionId: perm.id });
@@ -343,7 +343,7 @@ describe("Project Owner Module", () => {
   it("should reject if a user tries to update someone else's profile", async () => {
     // 1. Setup poRole with edit_self
     const [poRole] = await db.insert(role).values({ name: "po_edit_other", description: "PO Edit Other" }).returning();
-    const [perm] = await db.insert(permission).values({ resource: "project_owners", action: "edit_self" }).returning();
+    const [perm] = await db.insert(permission).values({ resource: "project_owner", action: "edit_self" }).returning();
     await db
       .insert(rolePermission)
       .values({ roleId: poRole.id, permissionId: perm.id });
@@ -371,7 +371,7 @@ describe("Project Owner Module", () => {
 
   it("should allow an Admin to delete a project owner profile", async () => {
     // 1. Grant manage permission
-    const [perm] = await db.insert(permission).values({ resource: "project_owners", action: "manage" }).returning();
+    const [perm] = await db.insert(permission).values({ resource: "project_owner", action: "manage" }).returning();
     await db
       .insert(rolePermission)
       .values({ roleId: 1, permissionId: perm.id });

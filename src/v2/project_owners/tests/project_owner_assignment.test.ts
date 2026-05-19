@@ -53,11 +53,11 @@ describe('Project Owner Assignment Module', () => {
     return po;
   }
 
-  /** Grant the admin session user a named permission on project_owners */
+  /** Grant the admin session user a named permission on project_owner */
   async function grantAdminPermission(action: string) {
     const [perm] = await db
       .insert(permission)
-      .values({ resource: 'project_owners', action })
+      .values({ resource: 'project_owner', action })
       .returning();
 
     await db
@@ -91,7 +91,7 @@ describe('Project Owner Assignment Module', () => {
 
   // ── POST / ─────────────────────────────────────────────────────────────────
 
-  it('should allow an admin (project_owners:manage) to create a B2C primary assignment', async () => {
+  it('should allow an admin (project_owner:manage) to create a B2C primary assignment', async () => {
     //B2C = Crevy(we) onboarded the project owner ourselves
     await grantAdminPermission('manage');
     const po = await seedProjectOwner('po-create-001', 'PO-C-001');
@@ -114,7 +114,7 @@ describe('Project Owner Assignment Module', () => {
     expect(res.body.data.assignedBy).toBe(authHeaders.userId);
   });
 
-  it('should allow an admin (project_owners:manage) to create a B2B secondary assignment', async () => {
+  it('should allow an admin (project_owner:manage) to create a B2B secondary assignment', async () => {
     // B2B = Partner brought the PO. Admin assigns another Admin (or themselves) + PartnerId.
     await grantAdminPermission('manage');
     const po = await seedProjectOwner('po-b2b-ok', 'PO-B2B-OK');
@@ -146,7 +146,7 @@ describe('Project Owner Assignment Module', () => {
     expect(res.body.data.partnerId).toBe(partnerRow.id);
   });
 
-  it('should return 403 when a field agent (project_owners:assign) tries to create a B2B assignment', async () => {
+  it('should return 403 when a field agent (project_owner:assign) tries to create a B2B assignment', async () => {
     // Create agent role + assign permission
     const [agentRole] = await db
       .insert(role)
@@ -155,7 +155,7 @@ describe('Project Owner Assignment Module', () => {
 
     const [perm] = await db
       .insert(permission)
-      .values({ resource: 'project_owners', action: 'assign' })
+      .values({ resource: 'project_owner', action: 'assign' })
       .returning();
 
     await db
@@ -430,7 +430,7 @@ describe('Project Owner Assignment Module', () => {
 
     const [perm] = await db
       .insert(permission)
-      .values({ resource: 'project_owners', action: 'assign' })
+      .values({ resource: 'project_owner', action: 'assign' })
       .returning();
 
     await db

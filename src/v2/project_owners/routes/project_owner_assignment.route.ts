@@ -47,8 +47,8 @@ projectOwnerAssignmentRouter.post(
   '/',
   requireAuth,
   requirePermission(
-    ['project_owners', 'manage'],
-    ['project_owners', 'assign'],
+    ['project_owner', 'manage'],
+    ['project_owner', 'assign'],
   ),
   validateInboundRequest(CreateProjectOwnerAssignmentSchema),
   ProjectOwnerAssignmentController.createAssignment,
@@ -57,7 +57,7 @@ projectOwnerAssignmentRouter.post(
 projectOwnerAssignmentRouter.get(
   '/',
   requireAuth,
-  requirePermission(['project_owners', 'manage']),
+  requirePermission(['project_owner', 'manage']),
   validateInboundRequest(ListProjectOwnerAssignmentsQuerySchema),
   ProjectOwnerAssignmentController.listAssignments,
 );
@@ -72,8 +72,8 @@ projectOwnerAssignmentRouter.put(
   '/:id',
   requireAuth,
   requirePermission(
-    ['project_owners', 'manage'],
-    ['project_owners', 'assign'],
+    ['project_owner', 'manage'],
+    ['project_owner', 'assign'],
   ),
   validateInboundRequest(UpdateProjectOwnerAssignmentSchema),
   ProjectOwnerAssignmentController.updateAssignment,
@@ -82,7 +82,7 @@ projectOwnerAssignmentRouter.put(
 projectOwnerAssignmentRouter.delete(
   '/:id',
   requireAuth,
-  requirePermission(['project_owners', 'manage']),
+  requirePermission(['project_owner', 'manage']),
   ProjectOwnerAssignmentController.deleteAssignment,
 );
 

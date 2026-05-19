@@ -3,6 +3,7 @@ import { Router } from "express";
 import validateInboundRequest from "@/middleware/validateInboundRequest.middleware";
 import { registerSchema } from "../schemas/auth.schema";
 import AuthV2Controller from "../controllers/auth.controller";
+import CurrencyController from "../../deps/controllers/currency.controller";
 
 /**
  * V2 Auth routes
@@ -19,6 +20,11 @@ authV2Router.post(
   "/register",
   validateInboundRequest(registerSchema),
   AuthV2Controller.registerUser,
+);
+
+authV2Router.get(
+  "/currencies",
+  CurrencyController.getCurrencies
 );
 
 export default authV2Router;

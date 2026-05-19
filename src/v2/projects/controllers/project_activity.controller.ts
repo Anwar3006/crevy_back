@@ -10,7 +10,7 @@ const ProjectActivityController = {
   createActivity: catchAsync(async (req: Request, res: Response) => {
     const hasPermission = await RBACService.hasPermission(
       req.user!.id,
-      'project_owners',
+      'project_owner',
       'manage',
     );
 
@@ -30,7 +30,7 @@ const ProjectActivityController = {
   updateActivity: catchAsync(async (req: Request, res: Response) => {
     const hasPermission = await RBACService.hasPermission(
       req.user!.id,
-      'project_owners',
+      'project_owner',
       'manage',
     );
 
@@ -72,7 +72,7 @@ const ProjectActivityController = {
   deleteActivity: catchAsync(async (req: Request, res: Response) => {
     const hasPermission = await RBACService.hasPermission(
       req.user!.id,
-      'project_owners',
+      'project_owner',
       'manage',
     );
 

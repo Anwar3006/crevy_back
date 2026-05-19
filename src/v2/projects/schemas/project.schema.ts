@@ -28,7 +28,10 @@ export const CreateProjectSchema = z.object({
     description: z.string().min(20, 'Project description is required').max(1000),
     sdgs:        z.array(z.string()).default([]),
 
-    currencyId: z.number().int().positive('Select a currency'),
+    currency: z.object({
+      code: z.string().min(3).max(3),
+      name: z.string().min(1),
+    }),
   }),
 });
 
@@ -51,7 +54,10 @@ export const UpdateProjectSchema = z.object({
     totalAreaHectares: z.coerce.number().positive().optional(),
     startDate:         z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
     endDate:           z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
-    currencyId:        z.number().int().positive().optional(),
+    currency: z.object({
+      code: z.string().min(3).max(3),
+      name: z.string().min(1),
+    }).optional(),
   }),
 });
 

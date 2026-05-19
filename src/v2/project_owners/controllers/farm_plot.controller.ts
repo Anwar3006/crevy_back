@@ -14,7 +14,7 @@ const FarmPlotController = {
     const po = await ProjectOwnerService.getProjectOwnerById(projectOwnerId);
     
     const isAssignedAdmin = po.onboardedBy === req.user!.id;
-    const isSuperAdmin = await RBACService.hasPermission(req.user!.id, "project_owners", "manage");
+    const isSuperAdmin = await RBACService.hasPermission(req.user!.id, "project_owner", "manage");
 
     if (!isAssignedAdmin && !isSuperAdmin) {
       throw new AppError("You are not authorized to manage plots for this project owner", 403);
@@ -34,7 +34,7 @@ const FarmPlotController = {
     const po = await ProjectOwnerService.getProjectOwnerById(plot.projectOwnerId);
 
     const isAssignedAdmin = po.onboardedBy === req.user!.id;
-    const isSuperAdmin = await RBACService.hasPermission(req.user!.id, "project_owners", "manage");
+    const isSuperAdmin = await RBACService.hasPermission(req.user!.id, "project_owner", "manage");
 
     if (!isAssignedAdmin && !isSuperAdmin) {
       throw new AppError("You are not authorized to manage plots for this project owner", 403);
@@ -86,7 +86,7 @@ const FarmPlotController = {
     const po = await ProjectOwnerService.getProjectOwnerById(plot.projectOwnerId);
 
     const isAssignedAdmin = po.onboardedBy === req.user!.id;
-    const isSuperAdmin = await RBACService.hasPermission(req.user!.id, "project_owners", "manage");
+    const isSuperAdmin = await RBACService.hasPermission(req.user!.id, "project_owner", "manage");
 
     if (!isAssignedAdmin && !isSuperAdmin) {
       throw new AppError("You are not authorized to manage plots for this project owner", 403);

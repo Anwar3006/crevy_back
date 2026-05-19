@@ -31,7 +31,7 @@ describe('Projects Module', () => {
   async function grantAdminPermission(action: string) {
     const [perm] = await db
       .insert(permission)
-      .values({ resource: 'project_owners', action })
+      .values({ resource: 'project_owner', action })
       .returning();
 
     await db
@@ -278,7 +278,7 @@ describe('Projects Module', () => {
   it('should return 403 when a field agent tries to create a project', async () => {
     // Agent role with only assign permission
     const [agentRole] = await db.insert(role).values({ name: 'agent', description: 'Agent' }).returning();
-    const [perm] = await db.insert(permission).values({ resource: 'project_owners', action: 'assign' }).returning();
+    const [perm] = await db.insert(permission).values({ resource: 'project_owner', action: 'assign' }).returning();
     await db.insert(rolePermission).values({ roleId: agentRole.id, permissionId: perm.id });
 
     const agent = await getAuthHeaders(agentRole.id, { email: 'agent@test.io' });

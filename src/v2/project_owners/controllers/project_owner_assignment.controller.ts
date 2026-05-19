@@ -16,12 +16,12 @@ const ProjectOwnerAssignmentController = {
   createAssignment: catchAsync(async (req: Request, res: Response) => {
     const isAdmin = await RBACService.hasPermission(
       req.user!.id,
-      'project_owners',
+      'project_owner',
       'manage',
     );
     const isAgent = await RBACService.hasPermission(
       req.user!.id,
-      'project_owners',
+      'project_owner',
       'assign',
     );
 
@@ -42,7 +42,7 @@ const ProjectOwnerAssignmentController = {
     if (!isB2c) {
       const targetIsAdmin = await RBACService.hasPermission(
         req.body.agentId,
-        'project_owners',
+        'project_owner',
         'manage',
       );
       if (!targetIsAdmin) {
@@ -71,7 +71,7 @@ const ProjectOwnerAssignmentController = {
   updateAssignment: catchAsync(async (req: Request, res: Response) => {
     const isAdmin = await RBACService.hasPermission(
       req.user!.id,
-      'project_owners',
+      'project_owner',
       'manage',
     );
 

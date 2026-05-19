@@ -7,6 +7,7 @@ export default defineConfig({
     globals: true,
     environment: 'node',
     setupFiles: ['./src/tests/setup.ts'],
+    exclude: ['**/node_modules/**', '**/dist/**', '**/drizzle/**'],
 
     env: {
       NODE_ENV:            'test',
