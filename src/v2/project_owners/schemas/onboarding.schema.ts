@@ -13,7 +13,22 @@ export const projectOwnerOnboardingSchema = z.object({
     password: z.string().min(8, "Password must be at least 8 characters"),
     countryOfOperation: z.string().min(1, "Country is required"),
     
-    // Project Owner Table Info
+    // Flattened Payload Support (mapped to nested structures)
+    bankName: z.string().optional(),
+    bankAccountNumber: z.string().optional(),
+    bankAccountName: z.string().optional(),
+
+    momoNetwork: z.string().optional(),
+    momoNumber: z.string().optional(),
+    momoAccountName: z.string().optional(),
+
+    region: z.string().optional(),
+    village: z.string().optional(),
+    latitude: z.number().optional(),
+    longitude: z.number().optional(),
+    areaHectares: z.number().optional(),
+
+    // Legacy Nested Support (still supported)
     bankDetails: z.object({
       bankName: z.string(),
       accountNumber: z.string(),
@@ -26,7 +41,6 @@ export const projectOwnerOnboardingSchema = z.object({
       accountName: z.string().optional(),
     }).optional().nullable(),
 
-    // Farm Plot Table Info (Optional at registration)
     farmPlot: z.object({
       region: z.string().min(1),
       village: z.string().optional(),
@@ -41,6 +55,37 @@ export const projectOwnerOnboardingSchema = z.object({
     partnerId: z.number().optional().nullable(),
     assignmentType: z.enum(["primary", "secondary"]).default("primary"),
     isB2cAssignment: z.boolean().default(false),
+  }).transform((data) => {
+    // Map flat fields to nested structures if they exist
+    if (data.bankName && data.bankAccountNumber) {
+      data.bankDetails = {
+        bankName: data.bankName,
+        accountNumber: data.bankAccountNumber,
+        accountName: data.bankAccountName,
+      };
+    }
+
+    if (data.momoNetwork && data.momoNumber) {
+      data.momoDetails = {
+        network: data.momoNetwork,
+        number: data.momoNumber,
+        accountName: data.momoAccountName,
+      };
+    }
+
+    if (data.region && data.latitude !== undefined && data.longitude !== undefined && data.areaHectares !== undefined) {
+      data.farmPlot = {
+        region: data.region,
+        village: data.village,
+        centroid: {
+          lat: data.latitude,
+          lng: data.longitude,
+        },
+        areaHectares: data.areaHectares,
+      };
+    }
+
+    return data;
   })
 });
 

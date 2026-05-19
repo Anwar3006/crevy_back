@@ -42,7 +42,7 @@ describe("Project Owner Module", () => {
 
     // 4. Wipe users except the admin user used for authHeaders
     //    We use authHeaders.userId to ensure we don't invalidate the session.
-    await db.delete(user).where(ne(user.id, authHeaders.userId));
+    await db.delete(user).where(and(ne(user.id, authHeaders.userId), ne(user.id, "1")));
 
     // 5. Re-seed admin's rbac:manage permission (wiped above)
     await seedAdminPermissions();
@@ -55,7 +55,7 @@ describe("Project Owner Module", () => {
     await db.delete(rolePermission);
     await db.delete(permission);
     await db.delete(role).where(gt(role.id, 1));
-    await db.delete(user).where(ne(user.id, authHeaders.userId));
+    await db.delete(user).where(and(ne(user.id, authHeaders.userId), ne(user.id, "1")));
   });
 
   // ─── POST / ─────────────────────────────────────────────────────────────────
