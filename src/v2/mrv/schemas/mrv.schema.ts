@@ -170,3 +170,13 @@ export type TRegisterIngestion       = z.infer<typeof RegisterIngestionSchema>;
 export type TIngestionWebhook         = z.infer<typeof IngestionWebhookSchema>;
 export type TVerificationWebhook     = z.infer<typeof VerificationWebhookSchema>;
 export type TBlockchainWebhook       = z.infer<typeof BlockchainWebhookSchema>;
+
+// ─── Demo Simulation Schema ──────────────────────────────────────────────────
+
+export const SimulateProjectSchema = z.object({
+  params: z.object({
+    projectId: z.string().uuid('projectId must be a valid UUID'),
+  }),
+})
+
+export type TSimulateProject = z.infer<typeof SimulateProjectSchema>;

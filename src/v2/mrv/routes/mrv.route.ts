@@ -10,8 +10,10 @@ import {
   BlockchainWebhookSchema,
   GetIngestionByIdSchema,
   GetByProjectIdSchema,
+  SimulateProjectSchema,
 } from "../schemas/mrv.schema";
 import MrvController from "../controllers/mrv.controller";
+import MrvSimulationController from "../controllers/mrv_simulation.controller";
 
 const mrvRouter = Router();
 
@@ -180,5 +182,17 @@ mrvRouter.get(
   validateInboundRequest(GetByProjectIdSchema),
   MrvController.getAnchorsByProject
 );
+
+// ─── Demo Simulation Route ────────────────────────────────────────────────────
+// Simulates the full CraftedClimate dMRV pipeline for a given project.
+// Only available in non-production environments — enforced by the env guard.
+// Requires auth because it modifies project stage.
+
+mrvRouter.post(
+  '/simulate/:projectId',
+  requireAuth,
+  validateInboundRequest(SimulateProjectSchema),
+  MrvSimulationController.simulate,
+)
 
 export default mrvRouter;
