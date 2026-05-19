@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1778885836424,
-      "tag": "0000_modern_blockbuster",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1778951999845,
-      "tag": "0001_stormy_magik",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1779115177999,
-      "tag": "0002_nappy_whizzer",
+      "when": 1779150281510,
+      "tag": "0000_opposite_stone_men",
       "breakpoints": true
     }
   ]
