@@ -1,6 +1,6 @@
 import { db } from "@/config/db";
 import { user, projectOwner, farmPlot, projectOwnerAssignment, role } from "@/v2/parent-model";
-import { eq, or } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import AppError from "@/shared/errors/AppError";
 import { TProjectOwnerOnboarding } from "../schemas/onboarding.schema";
 import ProjectOwnerService from "./project_owner.service";
@@ -42,10 +42,6 @@ const OnboardingService = {
     }
 
     // 3. Create User via BetterAuth
-    // If email is provided, use signUpEmail, otherwise we use signUpEmail with a dummy email or 
-    // better yet, we might need a custom insert if better-auth doesn't support username-only signup easily via API.
-    // Actually, BetterAuth username plugin supports signUpUsername.
-    
     let betterUser;
     try {
       if (email) {
@@ -58,13 +54,14 @@ const OnboardingService = {
             lastName,
             contactNumber,
             countryOfOperation,
-            username: contactNumber, // Use contact number as username
+            // Do NOT pass username here when using signUpEmail.
+            // Better-auth's username plugin intercepts and can cause "Failed to create user".
+            // We'll patch the username directly in the DB after creation if needed.
             profileCompleted: true,
           }
         });
       } else {
-        // BetterAuth username signup
-        // @ts-ignore - plugin might not be typed in all environments
+        // @ts-ignore
         betterUser = await auth.api.signUpUsername({
           body: {
             username: contactNumber,
@@ -74,7 +71,6 @@ const OnboardingService = {
             lastName,
             contactNumber,
             countryOfOperation,
-            roleId: poRole.id,
             profileCompleted: true,
           }
         });
@@ -91,6 +87,11 @@ const OnboardingService = {
 
     // 4. Atomic Transaction for extension tables
     return await db.transaction(async (tx) => {
+      // Set role and username (if email-based)
+      await tx.update(user)
+        .set({ roleId: poRole.id, username: contactNumber })
+        .where(eq(user.id, userId));
+
       // a. Create Project Owner
       const code = await ProjectOwnerService.generateProjectOwnerCode();
       const [newPO] = await tx.insert(projectOwner).values({
@@ -111,7 +112,7 @@ const OnboardingService = {
           village: farmPlotData.village ?? null,
           centroid: `POINT(${farmPlotData.centroid.lng} ${farmPlotData.centroid.lat})`,
           areaHectares: farmPlotData.areaHectares.toString(),
-          boundaryCollectionMethod: "buffered_centroid", // Default for initial capture
+          boundaryCollectionMethod: "buffered_centroid",
         }).returning();
         newPlot = insertedPlot;
       }
@@ -127,7 +128,7 @@ const OnboardingService = {
       }).returning();
 
       return {
-        user: betterUser.user,
+        user: { ...betterUser.user, roleId: poRole.id, username: contactNumber },
         projectOwner: newPO,
         farmPlot: newPlot,
         assignment: newAssignment
